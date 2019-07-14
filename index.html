@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Deck Builder</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <h1>Optimizely SE Deck Builder</h1>
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" style="display: none;">Authorize</button>
+    <button id="signout_button" style="display: none;">Sign Out</button>
+    <button id="start_button" style="display: none">Start</button>
+    <span>Status:</span>
+    <span id="status">Ready</span>
+
+    <pre id="content" style="white-space: pre-wrap;"></pre>
+
+    <script type="text/javascript">
+      // Client ID and API key from the Developer Console
+      var CLIENT_ID = '529370699140-49hqfggg3pgfdt7k6dekftpe5bul388t.apps.googleusercontent.com';
+      var API_KEY = 'AIzaSyDn8xSNcp3an-8W503z0ErhTv6cSYpBZ4M';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://slides.googleapis.com/$discovery/rest?version=v1"];
+
+      var masterDeck = '1msaQkrQWsomqfVd7v6PwwbeHsKVtq2x3spNQDM96F4g';
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
+
+      var authorizeButton = document.getElementById('authorize_button');
+      var signoutButton = document.getElementById('signout_button');
+      var startButton = document.getElementById('start_button');
+
+
+      let destinationFolder = "";
+      let sourceDecks = [
+            [1, "1OqByJ6ZPO2V9gfCnclCJC73s6eGgYyJGb1WuyfViAws"],
+            [2, "1sigkNIYMRv-2DFc6AzxbrUK1O_eLzIn65iZ0-e0Gk34", "Digital Experience Optimization"], 
+            [3, "19l9AQWcAxqNO_hkCD8xq1xayXujFGOP4ztcuM4wsD0s", "Platform Overview"],
+            [4, "1l06tQGSWoodk70Pi_zNNrcYBVjTk3mfNn621PJK3zyg", "Program Management"],
+            [5, "1lalHoAi0lDTY-glmTk90cL4wdrsDPalYPZGhIgBuibo", "Web Experimentation"],
+            //[6, "1ZaYgH35n1a98hFy0IlLUuiDafL4aEiysg6Wz4EMR_Kk"],
+            //[7, "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI"],
+            //[8, "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A"],
+            //[9, "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ"],
+            //[10, "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc"],
+            //[11, "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8"],
+            //[12, "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw"],
+            //[13, "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8"],
+            //[14, "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw"]
+          ];
+
+      let deckLengths = []; 
+      let sectionsArray = [];
+      let sortedArray = [];
+      let createdDeckSlides = [];
+      let agendaText = "";
+      /**
+       *  On load, called to load the auth2 library and API client library.
+       */
+      function handleClientLoad() {
+        gapi.load('client:auth2', initClient);
+      }
+
+      /**
+       *  Initializes the API client library and sets up sign-in state
+       *  listeners.
+       */
+      function initClient() {
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+          loadClient();
+          // Handle the initial sign-in state.
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+          signoutButton.onclick = handleSignoutClick;
+          startButton.onclick = handleStartClick;
+        }, function(error) {
+          appendPre(JSON.stringify(error, null, 2));
+        });
+      }
+
+      /**
+       *  Called when the signed in status changes, to update the UI
+       *  appropriately. After a sign-in, the API is called.
+       */
+      function updateSigninStatus(isSignedIn) {
+        if (isSignedIn) {
+          authorizeButton.style.display = 'none';
+          signoutButton.style.display = 'block';
+          startButton.style.display = 'block'
+        } else {
+          authorizeButton.style.display = 'block';
+          signoutButton.style.display = 'none';
+        }
+      }
+  
+      
+      let newDeckID;
+      
+      function handleGenerateClick(){
+        generateDeck();
+        document.getElementById("generate_button").style.display = 'none';
+
+        var myDiv = document.getElementById("content"); 
+        var notifyCheckbox = document.createElement('label'); 
+        notifyCheckbox.innerHTML = '<input type="checkbox" id="notifyCheckbox" value="value" checked>Notify when ready<br>';
+        notifyCheckbox.name = "notifyCheckbox";
+        notifyCheckbox.Id = "notifyCheckbox"; 
+        myDiv.appendChild(notifyCheckbox); 
+        
+
+      };
+
+
+      function afterNewDeckGenerated(ID){
+        newDeckID = ID.result.id;
+        getSlideIDs();
+        changeTitle(newDeckID);
+      }
+
+
+      function generateAgendaText(){
+        agendaInt = 1
+        for (i=0; i<sortedArray.length; i++){
+          
+          if(document.getElementById("checkbox" + sortedArray[i].title).checked == true && i != 0){
+            agendaText = agendaText.concat(agendaInt + ". " + sourceDecks[i][2] + '\n');
+            agendaInt++;
+        }
+      }
+    }
+
+      function changeTitle(newDeckID){
+
+        document.getElementById("status").innerHTML = "Adding customer name and AE/SE to title page, building agenda";
+        
+        generateAgendaText();
+
+        gapi.client.slides.presentations.batchUpdate({
+        "presentationId": newDeckID,
+        "resource": {
+          "requests": [
+            {
+              "replaceAllText": {
+                "pageObjectIds": [
+                  createdDeckSlides[0]
+                ],
+                "containsText": {
+                  "text": "COMPANYNAME"
+                },
+                "replaceText": document.getElementById("customerName").value
+              }
+            }, 
+            {
+              "replaceAllText": {
+                "pageObjectIds": [
+                  createdDeckSlides[0]
+                ],
+                "containsText": {
+                  "text": "AEName"
+                },
+                "replaceText": document.getElementById("AEName").value
+              }
+            }, 
+            {
+              "replaceAllText": {
+                "pageObjectIds": [
+                  createdDeckSlides[0]
+                ],
+                "containsText": {
+                  "text": "SENAME"
+                },
+                "replaceText": document.getElementById("SEName").value
+              }
+            },
+            {
+              "replaceAllText": {
+                "pageObjectIds": [
+                  createdDeckSlides[1]
+                ],
+                "containsText": {
+                  "text": "AGENDAHERE"
+                },
+                "replaceText": agendaText
+              }
+            }
+          ]
+        }
+        })
+        .then(function(response) {
+              },
+                      function(err) { console.error("Execute error", err); });
+      }
+  
+      
+      function getSlideIDs(){
+        
+        document.getElementById("status").innerHTML = "getting IDs of slides in new deck";
+
+        gapi.client.slides.presentations.get({
+            presentationId: newDeckID,
+            
+          })
+              .then(function(response) {
+                      // Handlecons the results here (response.result has the parsed body).
+                      combineNamesAndIds(response.result.slides);
+                      createdDeckSlides = response.result.slides;
+                    },
+                    function(err) { console.error("Execute error", err); });
+      }
+
+      function combineNamesAndIds(array){
+        
+        document.getElementById("status").innerHTML = "combining names and IDs";
+
+        let labledSlides = [];
+        for(i=0; i<sortedArray.length; i++){
+          for(j=0; j<sortedArray[i].length; j++){
+            labledSlides.push(sortedArray[i].title);
+          }
+        }
+        let slideNamesAndIds = [];
+        for(i=0; i<array.length; i++){
+          nameAndId = {name: labledSlides[i], ID: array[i]};
+          slideNamesAndIds.push(nameAndId);
+        }
+        getCheckboxes(slideNamesAndIds);
+      };
+
+      function getCheckboxes(slideNamesAndIds){
+        
+        document.getElementById("status").innerHTML = "Reading Checkboxes";
+
+        let toDelete = [];
+        for (i=0; i<sortedArray.length; i++){
+          if(document.getElementById("checkbox" + sortedArray[i].title).checked == false){
+            for(j=0; j<slideNamesAndIds.length; j++){
+              if(sortedArray[i].title == slideNamesAndIds[j].name){
+                toDelete.push(slideNamesAndIds[j].ID.objectId);
+              }
+            }
+          }
+        }
+        
+        let deletionRequest = "[";
+        for(i=0; i<toDelete.length; i++){
+          deletionRequest = deletionRequest.concat('{"deleteObject": {"objectId": "' + toDelete[i] + '"}},');
+        }
+        deletionRequest = deletionRequest.slice(0, -1);
+        deletionRequest = deletionRequest.concat("]");
+        if (toDelete.length == 0){
+          finish();
+        } else{
+          deleteSlides(deletionRequest);
+        }
+        return toDelete;
+      }
+
+
+      function deleteSlides(deletionRequest){
+        document.getElementById("status").innerHTML = "Deleting unneeded sections";
+        deletionRequest = JSON.parse(deletionRequest);
+        gapi.client.slides.presentations.batchUpdate({
+            presentationId: newDeckID,
+            resource: {
+              requests: deletionRequest
+            }  
+        })
+              .then(function(response) {
+                  
+                  finish();
+                    },
+                    function(err) { console.error("Execute error", err); });
+      }
+
+      function finish(){
+        url = "https://docs.google.com/presentation/d/" + newDeckID;
+
+                  var btn = document.createElement("BUTTON");
+                  btn.innerHTML = 'Open Deck in New Tab';
+                  btn.onclick = function () { window.open(url, "_blank"); };
+                  document.getElementById("content").appendChild(btn);
+                  document.getElementById("status").innerHTML = "Done";
+                  if (document.getElementById("notifyCheckbox").checked == true){
+                    var notification = new Notification("Your deck is now ready; click here to open");
+                    notification.onclick = function(event) {
+                      event.preventDefault(); // prevent the browser from focusing the Notification's tab
+                      window.open(url, "_blank");
+                    }
+                  }
+      }
+
+      function sumSlides(index){
+        let sum = 0;
+        for (var i = 0; i<index; i++){  
+          sum = sum + sortedArray[i].length;
+        }
+        return sum;
+      }
+
+      function generateDeck() {
+          document.getElementById("status").innerHTML = "Copying Master Deck";
+          gapi.client.drive.files.copy({
+            "fileId": masterDeck,
+            "resource": {"name": document.getElementById("customerName").value + " | Optimizely Overview", "parents": [
+          destinationFolder
+        ]}
+          })
+              .then(function(response) {
+                      // Handle the results here (response.result has the parsed body).
+                      afterNewDeckGenerated(response)
+                    },
+                    function(err) { console.error("Execute error", err); });
+       }
+      
+
+       function loadClient() {
+          gapi.client.setApiKey(API_KEY);
+          return gapi.client.load("https://content.googleapis.com/discovery/v1/apis/drive/v3/rest")
+              .then(function() { 
+                console.log("GAPI client loaded for API"); },
+                    function(err) { console.error("Error loading GAPI client for API", err); });
+        }
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick(event) {
+        gapi.auth2.getAuthInstance().signIn();
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick(event) {
+        gapi.auth2.getAuthInstance().signOut();
+      }
+
+      function handleStartClick(){
+       sortedArray = getSectionLengths();
+       startButton.style.display = 'none';
+       createPicker();
+
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+
+
+      
+
+      async function getSectionLengths(){
+        document.getElementById("status").innerHTML = "getting lengths of source decks";
+
+
+        let decks = sourceDecks;
+
+          for (var i = 0; i < decks.length; i++) {
+                nthDeck = i + 1;
+                document.getElementById("status").innerHTML = "Getting Length of Source Deck " + nthDeck +" of " + decks.length;
+                let currentDeckID = decks[i][1];
+                let index = decks[i][0]
+               await gapi.client.slides.presentations.get({
+                  presentationId: currentDeckID
+                }).then(function(response) {
+                  var presentation = response.result;
+                  var length = presentation.slides.length;
+                  let title = presentation.title;
+                  section = {index: index, length: length, title: title};
+                  sectionsArray.push(section);
+                  sortedArray = sectionsArray.sort(function (a,b){return a.index - b.index;});              
+                  
+                }, function(response) {
+                  appendPre('Error: ' + response.result.error.message);
+                });              
+             }
+             renderCheckboxes();
+      }}
+      
+
+      function renderCheckboxes(){
+        
+        document.getElementById("status").innerHTML = "rendering checkboxes and input fields";
+
+        var customerTitle =document.createElement("h2");
+        customerTitle.innerHTML = "Customer Name";
+        document.getElementById("content").appendChild(customerTitle);
+
+        var customerNameInput = document.createElement("input"); 
+        customerNameInput.setAttribute('type', 'text');
+        customerNameInput.setAttribute('id', 'customerName');
+        document.getElementById("content").appendChild(customerNameInput);
+        var br = document.createElement("br");
+        document.getElementById("content").appendChild(br);
+
+
+
+        var AETitle =document.createElement("h2");
+        AETitle.innerHTML = "AE Name";
+        document.getElementById("content").appendChild(AETitle);
+
+        var AENameInput = document.createElement("input"); 
+        AENameInput.setAttribute('type', 'text');
+        AENameInput.setAttribute('id', 'AEName');
+        document.getElementById("content").appendChild(AENameInput);
+        var br = document.createElement("br");
+        document.getElementById("content").appendChild(br);
+
+
+        var SETitle =document.createElement("h2");
+        SETitle.innerHTML = "SE Name";
+        document.getElementById("content").appendChild(SETitle);
+
+        var SENameInput = document.createElement("input"); 
+        SENameInput.setAttribute('type', 'text');
+        SENameInput.setAttribute('id', 'SEName');
+        document.getElementById("content").appendChild(SENameInput);
+        var br = document.createElement("br");
+        document.getElementById("content").appendChild(br);
+
+
+        var sectionsTitle =document.createElement("h2");
+        sectionsTitle.innerHTML = "Sections";
+        document.getElementById("content").appendChild(sectionsTitle);
+
+        var node = document.createElement("LI");
+
+        for (var i = 0; i < sortedArray.length; i++){
+
+            var myDiv = document.getElementById("content"); 
+              
+            // creating checkbox element 
+            var checkbox = document.createElement('label'); 
+            checkbox.innerHTML = '<input type="checkbox" id="checkbox' + sortedArray[i].title +  '" value="value" checked>' + sortedArray[i].title + ' ('+ sortedArray[i].length + ' slides)<br>';
+            
+            checkbox.name = sortedArray[i].title; 
+              
+
+            myDiv.appendChild(checkbox); 
+        };
+
+        var br = document.createElement("br");
+        document.getElementById("content").appendChild(br);
+
+        var btn = document.createElement("BUTTON");
+        btn.innerHTML = 'Generate Deck';
+        btn.id = "generate_button";
+        btn.addEventListener('click', handleGenerateClick);
+        document.getElementById("content").appendChild(btn);
+
+        document.getElementById("status").innerHTML = "Ready";
+
+      };
+
+/*
+    function sendNotification() {
+        if (Notification.permission === "granted") {
+          // If it's okay let's create a notification
+          var notification = new Notification("Hi there!");
+        }
+
+        // Otherwise, we need to ask the user for permission
+        else if (Notification.permission !== "denied") {
+          Notification.requestPermission().then(function (permission) {
+            // If the user accepts, let's create a notification
+            if (permission === "granted") {
+              var notification = new Notification("Hi there!");
+            }
+          });
+        }
+      }
+
+      */
+
+       // Create and render a Picker object for searching images.
+    function createPicker() {
+    
+        var view = new google.picker.View(google.picker.ViewId.FOLDERS);
+        var folderView = new google.picker.DocsView(google.picker.ViewId.FOLDERS);
+        folderView.setSelectFolderEnabled(true);
+        view.setMimeTypes("application/vnd.google-apps.folder");
+        var picker = new google.picker.PickerBuilder()
+            .enableFeature(google.picker.Feature.NAV_HIDDEN)
+            //.enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+            .enableFeature(google.picker.Feature.MINE_ONLY)
+            //.setAppId(appId)
+            .setOAuthToken(oauthToken)
+            .addView(folderView)
+            .setDeveloperKey(API_KEY)
+            .setCallback(pickerCallback)
+            .build();
+         picker.setVisible(true);
+        //document.getElementById("picker:ht").innerHTML = "Choose output Foler";
+    }
+
+    // A simple callback implementation.
+    function pickerCallback(data) {
+      if (data.action == google.picker.Action.PICKED) {
+        var fileId = data.docs[0].id;
+        destinationFolder = fileId;
+      }
+    }
+
+
+    function loadPicker() {
+      gapi.load('auth', {'callback': onAuthApiLoad});
+      gapi.load('picker', {'callback': onPickerApiLoad});
+    }
+
+    function onAuthApiLoad() {
+      window.gapi.auth.authorize(
+          {
+            'client_id': CLIENT_ID,
+            'scope': SCOPES,
+            'immediate': false
+          },
+          handleAuthResult);
+    }
+
+    function onPickerApiLoad() {
+      pickerApiLoaded = true;
+    }
+
+    function handleAuthResult(authResult) {
+      if (authResult && !authResult.error) {
+        oauthToken = authResult.access_token;
+      }
+    }
+
+    var pickerApiLoaded = false;
+    var oauthToken;
+
+    </script>
+
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+
+    <script type="text/javascript" src="https://apis.google.com/js/api.js?onload=loadPicker"></script>
+  </body>
+</html>
