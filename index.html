@@ -3,6 +3,7 @@
   <head>
     <title>Deck Builder</title>
     <meta charset="utf-8" />
+    <script src="https://cdn.optimizely.com/js/15582140513.js"></script>
   </head>
   <body>
     <h1>Optimizely SE Deck Builder</h1>
@@ -291,6 +292,7 @@
         url = "https://docs.google.com/presentation/d/" + newDeckID;
 
                   var btn = document.createElement("BUTTON");
+                  btn.id = "openInNewTab"
                   btn.innerHTML = 'Open Deck in New Tab';
                   btn.onclick = function () { window.open(url, "_blank"); };
                   document.getElementById("content").appendChild(btn);
