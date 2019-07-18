@@ -4,6 +4,7 @@
     <title>Deck Builder</title>
     <meta charset="utf-8" />
     <script src="https://cdn.optimizely.com/js/15582140513.js"></script>
+    <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
   </head>
   <body>
     <h1>Optimizely SE Deck Builder</h1>
@@ -298,7 +299,7 @@
                   document.getElementById("content").appendChild(btn);
                   document.getElementById("status").innerHTML = "Done";
                   if (document.getElementById("notifyCheckbox").checked == true){
-                    var notification = new Notification("Your deck is now ready; click here to open");
+                    var notification = new Notification("SE Deck Builder", {"body": "Your deck is ready; click here to open", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"});
                     notification.onclick = function(event) {
                       event.preventDefault(); // prevent the browser from focusing the Notification's tab
                       window.open(url, "_blank");
