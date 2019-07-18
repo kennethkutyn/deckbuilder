@@ -16,6 +16,23 @@
     <span>Status:</span>
     <span id="status">Ready</span>
 
+    <div id="myProgress" style="visibility: hidden;">
+      <div id="myBar" ></div>
+    </div>
+
+    <style>
+      #myProgress {
+        width: 30%;
+        background-color: #ddd;
+      }
+
+      #myBar {
+        width: 1%;
+        height: 30px;
+        background-color: #0074ff;
+      }
+      </style>
+
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
     <script type="text/javascript">
@@ -61,7 +78,7 @@
       let createdDeckSlides = [];
       let agendaText = "";
       /**
-       *  On load, called to load the auth2 library and API client library.
+       *  On load, called to load the auth2 library and API client library and ask for permission to send browser notifications
        */
       function handleClientLoad() {
         gapi.load('client:auth2', initClient);
@@ -102,18 +119,37 @@
       function updateSigninStatus(isSignedIn) {
         if (isSignedIn) {
           authorizeButton.style.display = 'none';
-          signoutButton.style.display = 'block';
+          signoutButton.style.display = 'none';
           startButton.style.display = 'block'
         } else {
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
         }
       }
+
+      var width = 1;
+      function move(target) {
+        var elem = document.getElementById("myBar");   
+        
+        var id = setInterval(frame, 10);
+        function frame() {
+          if (width >= target) {
+            clearInterval(id);
+          } else {
+            width++; 
+            elem.style.width = width + '%'; 
+          }
+        }
+      }
   
       
       let newDeckID;
       
+      //Once the user clicks on 'Generate Deck', we should start copying the master deck, hide the generate button and create a notification button
+
       function handleGenerateClick(){
+        width = 1;
+
         generateDeck();
         document.getElementById("generate_button").style.display = 'none';
 
@@ -127,6 +163,7 @@
 
       };
 
+      //After the master deck copying is complete, get the IDs of all slides in the deck and change the customer, AE, SE names, then add the agenda
 
       function afterNewDeckGenerated(ID){
         newDeckID = ID.result.id;
@@ -134,6 +171,7 @@
         changeTitle(newDeckID);
       }
 
+      //Read the textboxes to determine what text to add to the agenda slide
 
       function generateAgendaText(){
         agendaInt = 1
@@ -147,7 +185,7 @@
     }
 
       function changeTitle(newDeckID){
-
+        move(50);
         document.getElementById("status").innerHTML = "Adding customer name and AE/SE to title page, building agenda";
         
         generateAgendaText();
@@ -274,6 +312,7 @@
 
 
       function deleteSlides(deletionRequest){
+        move(75);
         document.getElementById("status").innerHTML = "Deleting unneeded sections";
         deletionRequest = JSON.parse(deletionRequest);
         gapi.client.slides.presentations.batchUpdate({
@@ -292,12 +331,15 @@
       function finish(){
         url = "https://docs.google.com/presentation/d/" + newDeckID;
 
+                  move(100);
                   var btn = document.createElement("BUTTON");
                   btn.id = "openInNewTab"
                   btn.innerHTML = 'Open Deck in New Tab';
                   btn.onclick = function () { window.open(url, "_blank"); };
                   document.getElementById("content").appendChild(btn);
                   document.getElementById("status").innerHTML = "Done";
+                  document.getElementById("myProgress").style = "visibility: hidden;";
+
                   if (document.getElementById("notifyCheckbox").checked == true){
                     var notification = new Notification("SE Deck Builder", {"body": "Your deck is ready; click here to open", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"});
                     notification.onclick = function(event) {
@@ -307,15 +349,11 @@
                   }
       }
 
-      function sumSlides(index){
-        let sum = 0;
-        for (var i = 0; i<index; i++){  
-          sum = sum + sortedArray[i].length;
-        }
-        return sum;
-      }
 
       function generateDeck() {
+          move(10);
+          document.getElementById("myProgress").style = "visibility: visible;";
+
           document.getElementById("status").innerHTML = "Copying Master Deck";
           gapi.client.drive.files.copy({
             "fileId": masterDeck,
@@ -364,18 +402,18 @@
         pre.appendChild(textContent);
       }
 
-
-
-      
-
       async function getSectionLengths(){
         document.getElementById("status").innerHTML = "Reading source decks";
 
+        document.getElementById("myProgress").style = "visibility: visible;";
 
         let decks = sourceDecks;
 
           for (var i = 0; i < decks.length; i++) {
+                
                 nthDeck = i + 1;
+                percentProgress = nthDeck / decks.length * 100;
+                move(percentProgress);
                 document.getElementById("status").innerHTML = "Reading Source Deck " + nthDeck +" of " + decks.length;
                 let currentDeckID = decks[i][1];
                 let index = decks[i][0]
@@ -412,8 +450,6 @@
         var br = document.createElement("br");
         document.getElementById("content").appendChild(br);
 
-
-
         var AETitle =document.createElement("h2");
         AETitle.innerHTML = "AE Name";
         document.getElementById("content").appendChild(AETitle);
@@ -425,7 +461,6 @@
         var br = document.createElement("br");
         document.getElementById("content").appendChild(br);
 
-
         var SETitle =document.createElement("h2");
         SETitle.innerHTML = "SE Name";
         document.getElementById("content").appendChild(SETitle);
@@ -436,7 +471,6 @@
         document.getElementById("content").appendChild(SENameInput);
         var br = document.createElement("br");
         document.getElementById("content").appendChild(br);
-
 
         var sectionsTitle =document.createElement("h2");
         sectionsTitle.innerHTML = "Sections";
@@ -468,30 +502,11 @@
         document.getElementById("content").appendChild(btn);
 
         document.getElementById("status").innerHTML = "Ready";
+        document.getElementById("myProgress").style = "visibility: hidden;";
 
       };
 
-/*
-    function sendNotification() {
-        if (Notification.permission === "granted") {
-          // If it's okay let's create a notification
-          var notification = new Notification("Hi there!");
-        }
-
-        // Otherwise, we need to ask the user for permission
-        else if (Notification.permission !== "denied") {
-          Notification.requestPermission().then(function (permission) {
-            // If the user accepts, let's create a notification
-            if (permission === "granted") {
-              var notification = new Notification("Hi there!");
-            }
-          });
-        }
-      }
-
-      */
-
-       // Create and render a Picker object for searching images.
+       // Create and render a Picker object for choosing output folder.
     function createPicker() {
     
         var view = new google.picker.View(google.picker.ViewId.FOLDERS);
@@ -510,7 +525,6 @@
             .setTitle("Choose Output Folder")
             .build();
          picker.setVisible(true);
-        //document.getElementById("picker:ht").innerHTML = "Choose output Foler";
     }
 
     // A simple callback implementation.
