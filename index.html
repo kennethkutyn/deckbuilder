@@ -297,6 +297,12 @@
                 toDelete.push(slideNamesAndIds[j].ID.objectId);
               }
             }
+          }else{
+            window['optimizely'] = window['optimizely'] || [];
+            window['optimizely'].push({
+              type: "event",
+              eventName: sortedArray[i].title,
+            });
           }
         }
         
