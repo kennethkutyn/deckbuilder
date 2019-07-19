@@ -7,14 +7,16 @@
     <link rel="icon" href="favicon.ico" type="image/gif" sizes="16x16">
   </head>
   <body>
-    <h1>Optimizely SE Deck Builder</h1>
+    <h1 style="font-family: monospace;">Optimizely SE Deck Builder</h1>
 
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" style="display: none;">Authorize</button>
-    <button id="signout_button" style="display: none; visibility: hidden;">Sign Out</button>
-    <button id="start_button" style="display: none;">Start</button>
-    <span>Status:</span>
-    <span id="status">Ready</span>
+    <button id="signout_button" style="display: none; visibility: hidden; color: #ff6e6e; display: block;margin-bottom: 10px">Sign Out</button>
+    <button id="start_button" style="display: none; width: 100px; height: 30px; font-size: 16px; color: #0074ff">Start</button>
+    <span style="font-family: monospace; font-weight: bold; font-size: 16px;"><br>Status:</span>
+    <span id="status" style="font-family: monospace; font-size: 16px;">Ready</span>
+
+    <br>
 
     <div id="myProgress" style="visibility: hidden;">
       <div id="myBar" ></div>
@@ -22,7 +24,7 @@
 
     <style>
       #myProgress {
-        width: 30%;
+        width: 300px;
         background-color: #ddd;
       }
 
@@ -61,15 +63,17 @@
             [3, "19l9AQWcAxqNO_hkCD8xq1xayXujFGOP4ztcuM4wsD0s", "Platform Overview"],
             [4, "1l06tQGSWoodk70Pi_zNNrcYBVjTk3mfNn621PJK3zyg", "Program Management"],
             [5, "1lalHoAi0lDTY-glmTk90cL4wdrsDPalYPZGhIgBuibo", "Web Experimentation"],
-            //[6, "1ZaYgH35n1a98hFy0IlLUuiDafL4aEiysg6Wz4EMR_Kk"],
-            //[7, "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI"],
-            //[8, "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A"],
-            //[9, "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ"],
-            //[10, "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc"],
-            //[11, "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8"],
-            //[12, "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw"],
-            //[13, "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8"],
-            //[14, "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw"]
+            [6, "1ZaYgH35n1a98hFy0IlLUuiDafL4aEiysg6Wz4EMR_Kk", "Web Personalization"],
+            [7, "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI", "Web Personalization"],
+            [8, "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A", "Web Recommendations"],
+            [9, "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ", "Performance Considerations"],
+            [10, "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc", "Single Page Apps"],
+            [11, "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", "Full Stack"],
+            [12, "1recSXy68mBKg6m9T16nqgTfJ3jxXr1uz8Fv5dQlYhA0", "Build vs. Buy"],
+            [13, "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw", "Stats Engine"],
+            [14, "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8", "Stats Engine"],
+            [15, "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw", "Results and Reporting"],
+            [16, "1pUcHLJOy8vK-f3JKX3SP25stkjWSJ-tpzcHmXQccX1Y", "Next Steps"]
           ];
 
       let deckLengths = []; 
@@ -151,15 +155,15 @@
         width = 1;
 
         generateDeck();
+        document.getElementById('content').style.display = "none";
         document.getElementById("generate_button").style.display = 'none';
 
-        var myDiv = document.getElementById("content"); 
+        var myDiv = document.body; 
         var notifyCheckbox = document.createElement('label'); 
-        notifyCheckbox.innerHTML = '<input type="checkbox" id="notifyCheckbox" value="value" checked>Notify when ready<br>';
+        notifyCheckbox.innerHTML = '<br><input type="checkbox" id="notifyCheckbox" value="value" checked>Notify when ready<br>';
         notifyCheckbox.name = "notifyCheckbox";
-        notifyCheckbox.Id = "notifyCheckbox"; 
         myDiv.appendChild(notifyCheckbox); 
-        
+        document.getElementById('notifyCheckbox').parentElement.style = "font-family: monospace;";
 
       };
 
@@ -186,7 +190,7 @@
 
       function changeTitle(newDeckID){
         move(50);
-        document.getElementById("status").innerHTML = "Adding customer name and AE/SE to title page, building agenda";
+        document.getElementById("status").innerHTML = "Adding customer, AE and SE to title page then building agenda";
         
         generateAgendaText();
 
@@ -330,23 +334,24 @@
 
       function finish(){
         url = "https://docs.google.com/presentation/d/" + newDeckID;
+        document.getElementById('notifyCheckbox').parentElement.style.display = 'none';
+        move(100);
+        var btn = document.createElement("BUTTON");
+        btn.id = "openInNewTab"
+        btn.style = "width: 200px; height: 30px; font-size: 16px; color: #0074ff; margin-top: 10px";
+        btn.innerHTML = 'Open Deck in New Tab';
+        btn.onclick = function () { window.open(url, "_blank"); };
+        document.body.appendChild(btn);
+        document.getElementById("status").innerHTML = "Done";
+        document.getElementById("myProgress").style = "visibility: hidden;";
 
-                  move(100);
-                  var btn = document.createElement("BUTTON");
-                  btn.id = "openInNewTab"
-                  btn.innerHTML = 'Open Deck in New Tab';
-                  btn.onclick = function () { window.open(url, "_blank"); };
-                  document.getElementById("content").appendChild(btn);
-                  document.getElementById("status").innerHTML = "Done";
-                  document.getElementById("myProgress").style = "visibility: hidden;";
-
-                  if (document.getElementById("notifyCheckbox").checked == true){
-                    var notification = new Notification("SE Deck Builder", {"body": "Your deck is ready; click here to open", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"});
-                    notification.onclick = function(event) {
-                      event.preventDefault(); // prevent the browser from focusing the Notification's tab
-                      window.open(url, "_blank");
-                    }
-                  }
+        if (document.getElementById("notifyCheckbox").checked == true){
+          var notification = new Notification("SE Deck Builder", {"body": "Your deck is ready; click here to open", "icon": "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"});
+          notification.onclick = function(event) {
+            event.preventDefault(); // prevent the browser from focusing the Notification's tab
+            window.open(url, "_blank");
+          }
+        }
       }
 
 
@@ -414,7 +419,7 @@
                 nthDeck = i + 1;
                 percentProgress = nthDeck / decks.length * 100;
                 move(percentProgress);
-                document.getElementById("status").innerHTML = "Reading Source Deck " + nthDeck +" of " + decks.length;
+                document.getElementById("status").innerHTML = "Reading Source Deck " + nthDeck +" of " + decks.length + "<br>";
                 let currentDeckID = decks[i][1];
                 let index = decks[i][0]
                await gapi.client.slides.presentations.get({
@@ -498,8 +503,9 @@
         var btn = document.createElement("BUTTON");
         btn.innerHTML = 'Generate Deck';
         btn.id = "generate_button";
+        btn.style = "width: 200px; height: 30px; font-size: 16px; color: #0074ff";
         btn.addEventListener('click', handleGenerateClick);
-        document.getElementById("content").appendChild(btn);
+        document.body.appendChild(btn);
 
         document.getElementById("status").innerHTML = "Ready";
         document.getElementById("myProgress").style = "visibility: hidden;";
