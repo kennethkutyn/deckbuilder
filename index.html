@@ -58,22 +58,22 @@
 
       let destinationFolder = "";
       let sourceDecks = [
-            [1, "1OqByJ6ZPO2V9gfCnclCJC73s6eGgYyJGb1WuyfViAws"],
-            [2, "1sigkNIYMRv-2DFc6AzxbrUK1O_eLzIn65iZ0-e0Gk34", "Digital Experience Optimization"], 
-            [3, "19l9AQWcAxqNO_hkCD8xq1xayXujFGOP4ztcuM4wsD0s", "Platform Overview"],
-            [4, "1l06tQGSWoodk70Pi_zNNrcYBVjTk3mfNn621PJK3zyg", "Program Management"],
-            [5, "1lalHoAi0lDTY-glmTk90cL4wdrsDPalYPZGhIgBuibo", "Web Experimentation"],
-            [6, "1ZaYgH35n1a98hFy0IlLUuiDafL4aEiysg6Wz4EMR_Kk", "Web Personalization"],
-            [7, "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI", "Web Personalization"],
-            [8, "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A", "Web Recommendations"],
-            [9, "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ", "Performance Considerations"],
-            [10, "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc", "Single Page Apps"],
-            [11, "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", "Full Stack"],
-            [12, "1recSXy68mBKg6m9T16nqgTfJ3jxXr1uz8Fv5dQlYhA0", "Build vs. Buy"],
-            [13, "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw", "Stats Engine"],
-            [14, "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8", "Stats Engine"],
-            [15, "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw", "Results and Reporting"],
-            [16, "1pUcHLJOy8vK-f3JKX3SP25stkjWSJ-tpzcHmXQccX1Y", "Next Steps"]
+            [1, "1OqByJ6ZPO2V9gfCnclCJC73s6eGgYyJGb1WuyfViAws", "Title and Agenda", "Title and Agenda", 2],
+            [2, "1sigkNIYMRv-2DFc6AzxbrUK1O_eLzIn65iZ0-e0Gk34", "Digital Experience Optimization", "DXO 2.0", 14], 
+            [3, "19l9AQWcAxqNO_hkCD8xq1xayXujFGOP4ztcuM4wsD0s", "Platform Overview", "Platform Overview", 1],
+            [4, "1l06tQGSWoodk70Pi_zNNrcYBVjTk3mfNn621PJK3zyg", "Program Management", "Program Management", 7],
+            [5, "1lalHoAi0lDTY-glmTk90cL4wdrsDPalYPZGhIgBuibo", "Web Experimentation", "Web Experimentation", 6],
+            [6, "1ZaYgH35n1a98hFy0IlLUuiDafL4aEiysg6Wz4EMR_Kk", "Web Personalization", "Personalization - Short", 7],
+            [7, "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI", "Web Personalization", "Personalization - Full", 12],
+            [8, "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A", "Web Recommendations", "Recommendations", 7],
+            [9, "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ", "Performance Considerations", "Performance", 11],
+            [10, "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc", "Single Page Apps", "SPAs", 14],
+            [11, "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", "Full Stack", "Full Stack", 33],
+            [12, "1recSXy68mBKg6m9T16nqgTfJ3jxXr1uz8Fv5dQlYhA0", "Build vs. Buy", "Build vs Buy", 1],
+            [13, "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw", "Stats Engine", "Stats Engine Summary", 6],
+            [14, "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8", "Stats Engine", "Stats Engine Story", 22],
+            [15, "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw", "Results and Reporting", "Results and Reporting", 7],
+            [16, "1pUcHLJOy8vK-f3JKX3SP25stkjWSJ-tpzcHmXQccX1Y", "Next Steps", "Next Steps", 2]
           ];
 
       let deckLengths = []; 
@@ -403,7 +403,8 @@
       }
 
       function handleStartClick(){
-       sortedArray = getSectionLengths();
+       getSectionLengthsAlt();
+       //sortedArray = getSectionLengthsAlt();
        startButton.style.display = 'none';
        createPicker();
 
@@ -442,8 +443,28 @@
                   appendPre('Error: ' + response.result.error.message);
                 });              
              }
-             renderCheckboxes();
+            renderCheckboxes();
+  
       }}
+
+
+      function getSectionLengthsAlt(){
+
+        let decks = sourceDecks;
+
+        for (var i = 0; i < decks.length; i++) {
+          let currentDeckID = decks[i][1];
+          let index = decks[i][0]
+          var length = decks[i][4];
+          let title = decks[i][3];
+          section = {index: index, length: length, title: title};
+          sectionsArray.push(section);
+          sortedArray = sectionsArray.sort(function (a,b){return a.index - b.index;});
+
+        }
+        renderCheckboxes();
+
+      }
       
 
       function renderCheckboxes(){
