@@ -85,6 +85,17 @@
        *  On load, called to load the auth2 library and API client library and ask for permission to send browser notifications
        */
       function handleClientLoad() {
+        
+        if(getCookieValue("popups") != "true"){
+        var popup_window=window.open("www.google.com","myWindow","toolbar=no, location=no, directories=no, status=no, menubar=no, scrollbars=yes, resizable=yes, copyhistory=yes, width=10, height=10");  
+
+        try {
+        popup_window.focus();
+        popup_window.close();   
+        } catch (e) {
+         alert("Pop-up Blocker is enabled! Please choose 'Always allow popups for this site' and then reload the page");
+        }
+        }
         gapi.load('client:auth2', initClient);
         if (Notification.permission !== 'denied' || Notification.permission === "default") {
             Notification.requestPermission(function (permission) {
@@ -125,6 +136,7 @@
           authorizeButton.style.display = 'none';
           signoutButton.style.display = 'none';
           startButton.style.display = 'block'
+          document.cookie = "popups=true";
         } else {
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
@@ -145,7 +157,11 @@
           }
         }
       }
-  
+    
+      function getCookieValue(a) {
+        var b = document.cookie.match('(^|[^;]+)\\s*' + a + '\\s*=\\s*([^;]+)');
+        return b ? b.pop() : '';
+      }
       
       let newDeckID;
       
