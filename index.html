@@ -354,6 +354,9 @@
       }
 
       function finish(){
+          
+        document.cookie = "popups=true";  
+
         url = "https://docs.google.com/presentation/d/" + newDeckID;
         document.getElementById('notifyCheckbox').parentElement.style.display = 'none';
         move(100);
@@ -483,9 +486,9 @@
       
 
       function renderCheckboxes(){
-        document.cookie = "popups=true";
-
         
+
+
         document.getElementById("status").innerHTML = "rendering checkboxes and input fields";
 
         var customerTitle =document.createElement("h2");
