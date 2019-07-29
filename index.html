@@ -136,7 +136,6 @@
           authorizeButton.style.display = 'none';
           signoutButton.style.display = 'none';
           startButton.style.display = 'block'
-          document.cookie = "popups=true";
         } else {
           authorizeButton.style.display = 'block';
           signoutButton.style.display = 'none';
@@ -484,6 +483,8 @@
       
 
       function renderCheckboxes(){
+        document.cookie = "popups=true";
+
         
         document.getElementById("status").innerHTML = "rendering checkboxes and input fields";
 
