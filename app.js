@@ -53,7 +53,7 @@ function handleClientLoad() {
       popup_window.focus();
       popup_window.close();
     } catch (e) {
-      document.getElementById("status").innerHTML = "Pop-up Blocker is enabled! Please choose 'Always allow popups for this site' in the address bar and then reload the page";
+      document.getElementById("status").innerHTML = "Pop-up Blocker is disabled! Please choose 'Always allow popups for this site' in the address bar and then reload the page";
     }
   }
   gapi.load('client:auth2', initClient);
