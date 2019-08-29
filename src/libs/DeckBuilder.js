@@ -31,7 +31,7 @@ class DeckBuilder extends React.Component {
   }
 
   render() {
-    const { getFieldDecorator } = this.props.form;
+    const { getFieldDecorator } = this.props.form; 
 
     return (
       <Form hideRequiredMark={true} onSubmit={(e) => this.handleSubmit(e)}>
@@ -39,22 +39,19 @@ class DeckBuilder extends React.Component {
           <Col xs={24} sm={12} md={10} lg={8}>
             <Form.Item label="Customer Name">
               {getFieldDecorator('customer_name', {
-                rules: [{ required: true, message: 'Please input a customer name!', whitespace: true }],
-                initialValue: "Customer"
+                rules: [{ required: true, message: 'Please input a customer name!', whitespace: true }]
               })(<Input />)}
             </Form.Item>
 
             <Form.Item label="AE Name">
               {getFieldDecorator('ae_name', {
-                rules: [{ required: true, message: 'Please input an AE name!', whitespace: true }],
-                initialValue: "AE"
+                rules: [{ required: true, message: 'Please input an AE name!', whitespace: true }]
               })(<Input />)}
             </Form.Item>
 
             <Form.Item label="SE Name">
               {getFieldDecorator('se_name', {
-                rules: [{ required: true, message: 'Please input an SE name!', whitespace: true }],
-                initialValue: "SE"
+                rules: [{ required: true, message: 'Please input an SE name!', whitespace: true }]
               })(<Input />)}
             </Form.Item>
 

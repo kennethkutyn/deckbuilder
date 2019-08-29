@@ -1,6 +1,6 @@
 import React from 'react';
 import './App.css';
-import DeckBuilder from './libs/DeckBuilder/DeckBuilder.js';
+import DeckBuilder from './libs/DeckBuilder.js';
 import GoogleHelper from './libs/GoogleHelper.js';
 import OptimizelyHelper from './libs/OptimizelyHelper.js';
 import {
