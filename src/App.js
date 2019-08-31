@@ -2,7 +2,6 @@ import React from 'react';
 import './App.css';
 import DeckBuilder from './libs/DeckBuilder.js';
 import GoogleHelper from './libs/GoogleHelper.js';
-import OptimizelyHelper from './libs/OptimizelyHelper.js';
 import {
   Layout, 
   Menu, 
@@ -46,9 +45,6 @@ class App extends React.Component {
 
     // Load the Google Helper for use in this component
     this.googleHelper = new GoogleHelper();
-
-    // Load the Optimizely Helper for use in this component
-    this.optimizelyHelper = new OptimizelyHelper();
   }
 
   /**
@@ -271,11 +267,6 @@ class App extends React.Component {
       generating: true,
       generatingMessage: "Copying master deck to new location"
     });
-
-    // Track chosen decks via Optimizely
-    for(const deck of chosenDecks) {
-      this.optimizelyHelper.trackEvent(deck.title);
-    }
 
     // Get relevant variables from the values object
     const customerName  = values.customer_name;
