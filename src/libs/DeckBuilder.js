@@ -13,17 +13,7 @@ class DeckBuilder extends React.Component {
     super(props);
 
     // Get the right set of decks
-    let decks = decksImport.se; // We can introduce other decks for AEs and other teams in the future
-
-    // Lets take the list of decks and add an "offset" to them so we can easily delete them in the future
-    let currOffset = 0;
-    for(var i = 0; i < decks.length; i++) {
-      // Add the current offset into the decks array
-      decks[i]["offset"] = currOffset;
-
-      // Add the number of decks to the offset
-      currOffset += decks[i].slides;
-    }
+    let decks = this.prepareDecks(decksImport.se); // TODO: Add functionality to change decks here
 
     // Set the state of this component
     this.state = {
@@ -136,6 +126,25 @@ class DeckBuilder extends React.Component {
         </div>
       </Form>
     );
+  }
+
+  /**
+   * Prepare the list of individual decks for the deckbuilder to handle
+   * @param  {array} decks  The array of decks that we will use
+   * @return {array}        The fixed/finished array of decks
+   */
+  prepareDecks(decks) {
+    // Lets take the list of decks and add an "offset" to them so we can easily delete them in the future
+    let currOffset = 0;
+    for(var i = 0; i < decks.length; i++) {
+      // Add the current offset into the decks array
+      decks[i]["offset"] = currOffset;
+
+      // Add the number of decks to the offset
+      currOffset += decks[i].slides;
+    }
+
+    return decks;
   }
 
   /**
