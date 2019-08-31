@@ -157,6 +157,7 @@ class App extends React.Component {
                   notificationsAllowed={notifsAllowed}
                   shouldNotify={shouldNotify}
                   notifyCallback={(shouldNotify) => this.shouldNotifyChanged(shouldNotify)}
+                  seName={googleUsername}
                 />
               </Spin>
             )}

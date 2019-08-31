@@ -15,9 +15,9 @@ export default class GoogleHelper {
     // Hidden vars for use in getter/setter functions
     this.currentUser_ = null;
   }
-  
   /**
-   * Load the Gapis into a script tag and append it to the body of the document
+   * Load the GAPIs into a script tag and append it to the body of the document
+   * @return {null} 
    */
   load() {
     return new Promise((resolve, reject) => {
@@ -38,8 +38,10 @@ export default class GoogleHelper {
     });
   }
 
-  /** 
-   * Load GAPI modules
+  
+  /**
+   * Load google api modules that are required
+   * @return {Promise} Promise 
    */
   loadGapiModules() {
     return new Promise((resolve, reject) => {
@@ -63,8 +65,9 @@ export default class GoogleHelper {
     });
   }
 
-  /** 
+  /**
    * Perform sign in for the user
+   * @return {Promise} promise
    */
   signIn() {
     return new Promise((resolve, reject) => {
@@ -73,30 +76,38 @@ export default class GoogleHelper {
     });
   }
 
-  /** 
-   * Getter to tell if the user is signed in
+  /**
+   * Getter to tell if a user is signed in or not
+   * @return {Boolean} Whether the user is signed in
    */
   get isSignedIn() {
     return this.currentUser_.isSignedIn();
   }
 
+  /**
+   * Getter for the user's auth token/access token/oauth token
+   * @return {string} oAuth token
+   */
   get authToken() {
     return this.currentUser_.getAuthResponse().access_token;
   }
 
   /**
-   * Get the Google username of the user
+   * Get the username of the user from google
+   * @return {string} The username if they are logged in, null if not
    */
   getUsername() {
     if(this.currentUser_.isSignedIn()) {
-      return this.currentUser_.w3.ofa;
+      return this.currentUser_.w3.ig;
     }
     // TODO: replace with thrown error
     return null;
   } 
 
   /**
-   * Generate a picker view and show it
+   * Generates a picker view and shows it on screen to the user
+   * @param  {function} selectedFolderCallback Callback for when a user selects a folder in the picker
+   * @return {null}
    */
   createPicker(selectedFolderCallback) {
     let view = new window.google.picker.View(window.google.picker.ViewId.FOLDERS);
@@ -117,7 +128,8 @@ export default class GoogleHelper {
   }
 
   /**
-   * Load the drive client
+   * Load the drive client for using drive apis
+   * @return {Promise} promise
    */
   loadDriveClient() {
     return new Promise((resolve, reject) => {
@@ -135,7 +147,10 @@ export default class GoogleHelper {
   }
 
   /**
-   * Copy the master deck into the folder that the user selected
+   * Copy the master deck into the new folder location
+   * @param  {string} filename          The filename for the new master deck
+   * @param  {string} destinationFolder Folder id for where the new master deck should be copied to
+   * @return {Promise}                  Promise
    */
   copyMasterDeck(filename, destinationFolder) {
     return new Promise((resolve, reject) => {
@@ -156,7 +171,9 @@ export default class GoogleHelper {
   }
 
   /**
-   * Get presentation from google drive by id
+   * Get a presentation from google using the file id
+   * @param  {string} fileId ID of the file on google drive
+   * @return {Promise}       Promise
    */
   getPresentation(fileId) {
     return new Promise((resolve, reject) => {
@@ -167,6 +184,12 @@ export default class GoogleHelper {
     });
   }
 
+  /**
+   * Perform a batch update to a deck on google 
+   * @param  {string} deckId  The ID of the deck that needs to be updated
+   * @param  {array} updates  The updates that need to be performed
+   * @return {Promise}        Promise
+   */
   batchUpdateDeck(deckId, updates) {
     return new Promise((resolve, reject) => {
       window.gapi.client.slides.presentations.batchUpdate({
@@ -179,7 +202,10 @@ export default class GoogleHelper {
   }
 
   /**
-   *
+   * Update the slides by replacing text
+   * @param  {string} deckId  The ID for the deck to update the text in
+   * @param  {array} options  The replacement options
+   * @return {Promise}        Promise
    */
   updateSlidesByReplacingText(deckId, options) {
     let replacements = [];
@@ -202,18 +228,24 @@ export default class GoogleHelper {
     });
   }
 
+  /**
+   * Delete slides of a Google deck
+   * @param  {string} deckId   Deck ID
+   * @param  {array} slideIds  IDs of the slides to delete from the deck
+   * @return {Promise}          promise
+   */
   deleteSlides(deckId, slideIds) {
-    return new Promise((resolve, reject) => {
-      // Build the delete objects
-      let deletions = [];
-      for(const slideId of slideIds) {
-        deletions.push({
-          deleteObject: {
-            objectId: slideId
-          }
-        });
-      }
+    // Build the delete objects
+    let deletions = [];
+    for(const slideId of slideIds) {
+      deletions.push({
+        deleteObject: {
+          objectId: slideId
+        }
+      });
+    }
 
+    return new Promise((resolve, reject) => {
       // Just need to pass it through for now
       this.batchUpdateDeck(deckId, deletions).then(() => resolve());
     })

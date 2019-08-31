@@ -1,9 +1,14 @@
 import React from 'react';
-import decksImport from '../../config/decks.json'; // TODO: pass slides from App.js??
+import decksImport from '../config/decks.json'; // TODO: pass slides from App.js??
 import {Button, Form, Input, Row, Col, Checkbox} from 'antd';
 
 class DeckBuilder extends React.Component {
 
+  /**
+   * Constructor
+   * @param  {Object} props Properties that are passed into this component by parent
+   * @return {null}
+   */
   constructor(props) {
     super(props);
 
@@ -22,14 +27,19 @@ class DeckBuilder extends React.Component {
 
     // Set the state of this component
     this.state = {
-      decks:          decks,
-      indeterminate:  false,
-      checkAll:       false,
-      checkedList:    [],
-      shouldNotify:   this.props.shouldNotify
+      decks:          decks,                    // The current decks that the user has selected
+      indeterminate:  false,                    // For the indeterminate state of the "check all" checkbox
+      checkAll:       false,                    // Whether all the checkboxes are checked or not
+      checkedList:    [],                       // The list of checked checkboxes (decks)
+      shouldNotify:   this.props.shouldNotify,  // Whether the checkbox for "notify" should be checked or not
+      logo:           null                      // The current logo (determined from the customer name)
     };
   }
 
+  /**
+   * Render this component in react
+   * @return {React.Component} Renders the entire app
+   */
   render() {
     const { getFieldDecorator } = this.props.form; 
 
@@ -37,11 +47,26 @@ class DeckBuilder extends React.Component {
       <Form hideRequiredMark={true} onSubmit={(e) => this.handleSubmit(e)}>
         <Row gutter={{xs: 0, sm: 32}}>
           <Col xs={24} sm={12} md={10} lg={8}>
-            <Form.Item label="Customer Name">
-              {getFieldDecorator('customer_name', {
-                rules: [{ required: true, message: 'Please input a customer name!', whitespace: true }]
-              })(<Input />)}
-            </Form.Item>
+
+            <Row gutter={16}>
+              <Col span={18}>
+                <Form.Item label="Customer Name">
+                  {getFieldDecorator('customer_name', {
+                    rules: [{ required: true, message: 'Please input a customer name!', whitespace: true }]
+                  })(<Input onBlur={(e)=>this.handleCompanyNameChange(e)} />)}
+                </Form.Item>
+              </Col>
+              <Col span={6}>
+                {typeof this.state.logo !== "undefined" && (
+                  <img 
+                    src={this.state.logo} 
+                    style={{
+                      width: '100%'
+                    }}
+                  />
+                )}
+              </Col>
+            </Row>
 
             <Form.Item label="AE Name">
               {getFieldDecorator('ae_name', {
@@ -51,7 +76,8 @@ class DeckBuilder extends React.Component {
 
             <Form.Item label="SE Name">
               {getFieldDecorator('se_name', {
-                rules: [{ required: true, message: 'Please input an SE name!', whitespace: true }]
+                rules: [{ required: true, message: 'Please input an SE name!', whitespace: true }],
+                initialValue: this.props.seName
               })(<Input />)}
             </Form.Item>
 
@@ -112,29 +138,48 @@ class DeckBuilder extends React.Component {
     );
   }
 
+  /**
+   * Handle the user checking/unchecking the "notify" checkbox
+   * @param  {object} e Event object (get target with e.target)
+   * @return {null}  
+   */
   notifyChange(e) {
+    // Call the delegae callback
     this.props.notifyCallback(e.target.checked);
   }
 
+  /**
+   * Handle the user checking a deck checkbox on/off
+   * @param  {array} checkedList Array of checkbox values
+   * @return {null}
+   */
   onChange(checkedList) {
+    // Set the state of the component to reflect the checkboxes that have been ticked
     this.setState({
       checkedList,
-      indeterminate: !!checkedList.length && checkedList.length < this.state.decks.length,
-      checkAll: checkedList.length === this.state.decks.length,
+      indeterminate:  !!checkedList.length && checkedList.length < this.state.decks.length,
+      checkAll:       checkedList.length === this.state.decks.length,
     });
   }
 
+  /**
+   * Handle someone checking/unchecking the "check all" checkbox
+   * @param  {object} e The checkbox event
+   * @return {null}   
+   */
   onCheckAllChange(e) {
     // Get a list of all the checkbox values we need to tick
     const checkboxes = [];
     this.state.decks.map((value, index) => checkboxes.push(value.google_id));
 
+    // Set all the checkboxes in the form to either on or off
     this.props.form.setFields({
       decks: {
-        value: e.target.checked ? checkboxes : []
+        value: e.target.checked ? checkboxes : [] // Empty array means all boxes are unchecked
       },
     }); 
 
+    // Set the state of the component
     this.setState({
       checkAll: e.target.checked,
       indeterminate: false,
@@ -142,17 +187,23 @@ class DeckBuilder extends React.Component {
     });
   }
 
+  /**
+   * Handle the user clicking "generate" or submitting the form
+   * @param  {object} e The form submit event
+   * @return {null}   
+   */
   handleSubmit(e) {
+    // Stop the form from actually submitting
     e.preventDefault();
     
-    // Get form values
+    // Validate the form (this returns either an error or the values from the form)
     this.props.form.validateFields((err, values) => {
+      // Check that there's no error (the form will handle itself if there's an error)
       if (!err) {
         let deletedDecks = [],
             chosenDecks  = [];
 
-        // Run through the original decks and create new lists for
-        // chosen and deleted slides
+        // Run through the original decks and create new lists for chosen and deleted slides
         for(const deck of this.state.decks) {
           if(values.decks.indexOf(deck.google_id) < 0) {
             // This slide hasn't been chosen and should be added to deleted array
@@ -164,9 +215,55 @@ class DeckBuilder extends React.Component {
           }
         }
 
+        // Callback to delegate
         this.props.generate(values, chosenDecks, deletedDecks);
       }
     });
+  }
+
+  /**
+   * Handle when the company name changes and the field blurs
+   * @param  {object} e The event from the blur event
+   * @return {null}   
+   */
+  handleCompanyNameChange(e) {
+    // Get the value
+    let partial = e.target.value;
+
+    // Create an abort controller array
+    if(typeof this.abortControllers_ === "undefined") {
+      this.abortControllers_ = [];
+    }
+
+    // Lets abort all the earlier abortControllers
+    for(const abortController of this.abortControllers_) {
+      abortController.abort();
+    }
+
+    // Create a new abort controller for this fetch
+    let abortController = new AbortController();
+    
+    // Fetch the autocomplete suggestions
+    fetch("https://autocomplete.clearbit.com/v1/companies/suggest?query=" + partial, {
+      method: "get",
+      signal: abortController.signal
+    })
+    .then((response) => response.json())
+    .then((response) => {
+      // Get the first image
+      let logo = response[0].logo;
+
+      // Set the state
+      this.setState({
+        logo: logo
+      });
+    })
+    .catch((err) => {
+      console.log("Error", err);
+    });
+
+    // Add this abort controller to the array to be aborted if necessary
+    this.abortControllers_.push(abortController);
   }
 
 }
