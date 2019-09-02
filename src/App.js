@@ -143,7 +143,7 @@ class App extends React.Component {
             {/* Page for configuring your slide deck */}
             {current === 2 && (
               <Spin tip={this.state.generatingMessage} spinning={this.state.generating}>
-                <DeckBuilder 
+                <DeckBuilderForm 
                   team={team} 
                   generate={(values, chosenDecks, deletedDecks) => this.generateDeck(values, chosenDecks, deletedDecks)}
                   notificationsAllowed={notifsAllowed}
