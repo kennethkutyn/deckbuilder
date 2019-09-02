@@ -1,23 +1,19 @@
-import React from 'react';
 import './App.css';
-import DeckBuilder from './libs/DeckBuilder.js';
-import GoogleHelper from './libs/GoogleHelper.js';
+import React            from 'react';
+import DeckBuilderForm  from './libs/DeckBuilderForm.js';
+import GoogleHelper     from './libs/GoogleHelper.js';
+import logo             from './logo.svg'
 import {
-  Layout, 
-  Menu, 
-  Typography, 
-  Steps, 
-  Button, 
-  message, 
-  Icon, 
-  Spin,
+  Layout,     Menu, 
+  Typography, Steps, 
+  Button,     message, 
+  Icon,       Spin,
   Result
-} from 'antd';
-import logo from './logo.svg'
+}                       from 'antd';
 
 const {Header, Content} = Layout;
-const {Title, Text} = Typography;
-const {Step} = Steps;
+const {Title, Text}     = Typography;
+const {Step}            = Steps;
 
 class App extends React.Component {
 
@@ -82,7 +78,7 @@ class App extends React.Component {
     const current         = this.state.current,
           loggedIn        = this.state.loggedIn,
           googleUsername  = this.state.googleUsername,
-          folderName      = this.state.destinationFolder ? this.state.destinationFolder.name : null,
+          folderName      = (this.state.destinationFolder ? this.state.destinationFolder.name : null),
           deckUrl         = this.state.deckUrl,
           team            = this.state.team,
           notifsAllowed   = this.state.notifsAllowed,

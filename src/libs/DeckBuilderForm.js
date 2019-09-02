@@ -2,7 +2,7 @@ import React from 'react';
 import decksImport from '../config/decks.json'; // TODO: pass slides from App.js??
 import {Button, Form, Input, Row, Col, Checkbox} from 'antd';
 
-class DeckBuilder extends React.Component {
+class DeckBuilderForm extends React.Component {
 
   /**
    * Constructor
@@ -277,4 +277,4 @@ class DeckBuilder extends React.Component {
 
 }
 
-export default Form.create()(DeckBuilder);
+export default Form.create()(DeckBuilderForm);
