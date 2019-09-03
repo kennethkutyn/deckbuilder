@@ -3,6 +3,7 @@ import React            from 'react';
 import DeckBuilderForm  from './libs/DeckBuilderForm.js';
 import GoogleHelper     from './libs/GoogleHelper.js';
 import logo             from './logo.svg'
+import AnalyticsHelper  from './libs/AnalyticsHelper.js';
 import {
   Layout,     Menu, 
   Typography, Steps, 
@@ -41,6 +42,9 @@ class App extends React.Component {
 
     // Load the Google Helper for use in this component
     this.googleHelper = new GoogleHelper();
+
+    // Load the Analytics Helper for use in this component
+    this.analyticsHelper = new AnalyticsHelper();
   }
 
   /**
@@ -263,6 +267,11 @@ class App extends React.Component {
       generating: true,
       generatingMessage: "Copying master deck to new location"
     });
+
+    // Track decks via analytics
+    for(const deck of chosenDecks) {
+      this.analyticsHelper.track(deck);
+    }
 
     // Get relevant variables from the values object
     const customerName  = values.customer_name;
