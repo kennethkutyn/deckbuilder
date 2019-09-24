@@ -347,7 +347,7 @@ class App extends React.Component {
     let agendaInt   = 1;
     let agendaText  = "";
     for(const deck of chosenDecks) {
-      agendaText += agendaInt + ". " + deck.title + "\n";
+      agendaText += agendaInt + ". " + deck.agendaTitle + "\n";
       agendaInt++;
     }
 
