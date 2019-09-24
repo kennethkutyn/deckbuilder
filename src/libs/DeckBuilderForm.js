@@ -224,6 +224,9 @@ class DeckBuilderForm extends React.Component {
           }
         }
 
+        // Add the customer logo to the values array
+        values.logo = this.state.logo; 
+
         // Callback to delegate
         this.props.generate(values, chosenDecks, deletedDecks);
       }
