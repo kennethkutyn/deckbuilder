@@ -268,6 +268,9 @@ class App extends React.Component {
       generatingMessage: "Copying master deck to new location"
     });
 
+    this.analyticsHelper.trackState("generate clicked");
+
+
     // Track decks via analytics
     for(const deck of chosenDecks) {
       this.analyticsHelper.track(deck);
@@ -445,6 +448,9 @@ class App extends React.Component {
     this.setState({
       current: this.state.current + 1
     });
+
+    this.analyticsHelper.trackState("finished generating");
+
 
     // Check if the user wants to be notified
     if(this.state.shouldNotify) {

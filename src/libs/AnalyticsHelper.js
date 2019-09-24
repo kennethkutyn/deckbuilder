@@ -1,6 +1,6 @@
 import ReactGA from 'react-ga';
 
-ReactGA.initialize("UA-146656690-1");
+ReactGA.initialize("UA-146656690-1", { debug: true });
 export default class AnalyticsHelper {
 
   track(deck) {
