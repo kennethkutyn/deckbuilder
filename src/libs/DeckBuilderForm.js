@@ -99,7 +99,7 @@ class DeckBuilderForm extends React.Component {
                     return(
                       <Row key={index}>
                         <Col span={24}>
-                          <Checkbox value={value.google_id}>{value.title}</Checkbox>
+                          <Checkbox value={value.order}>{value.title} ({value.slides} slides)</Checkbox>
                         </Col>
                       </Row>
                     )
@@ -179,7 +179,7 @@ class DeckBuilderForm extends React.Component {
   onCheckAllChange(e) {
     // Get a list of all the checkbox values we need to tick
     const checkboxes = [];
-    this.state.decks.map((value, index) => checkboxes.push(value.google_id));
+    this.state.decks.map((value, index) => checkboxes.push(value.order));
 
     // Set all the checkboxes in the form to either on or off
     this.props.form.setFields({
@@ -214,7 +214,7 @@ class DeckBuilderForm extends React.Component {
 
         // Run through the original decks and create new lists for chosen and deleted slides
         for(const deck of this.state.decks) {
-          if(values.decks.indexOf(deck.google_id) < 0) {
+          if(values.decks.indexOf(deck.order) < 0) {
             // This slide hasn't been chosen and should be added to deleted array
             deletedDecks.push(deck);
           }

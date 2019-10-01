@@ -10,7 +10,7 @@ export default class GoogleHelper {
     // Configure some of the variables for the gapis sdk
     this.scope = "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
     this.discoveryDocs = ["https://slides.googleapis.com/$discovery/rest?version=v1"];
-    this.masterDeckId = '1msaQkrQWsomqfVd7v6PwwbeHsKVtq2x3spNQDM96F4g';
+    this.masterDeckId = '1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4';
 
     // Hidden vars for use in getter/setter functions
     this.currentUser_ = null;

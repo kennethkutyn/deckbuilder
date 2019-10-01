@@ -9,107 +9,135 @@
             },
             {
                   "order": 2,
+                  "google_id": "", 
+                  "title": "Current State and Goals", 
+                  "agendaTitle": "Current State and Goals",
+                  "slides": 1
+            },
+            {
+                  "order": 3,
                   "google_id": "1sigkNIYMRv-2DFc6AzxbrUK1O_eLzIn65iZ0-e0Gk34", 
                   "title": "DXO", 
                   "agendaTitle": "Digital Experience Optimization",
                   "slides": 14
             },
             {
-                  "order": 3,
+                  "order": 4,
                   "google_id": "19l9AQWcAxqNO_hkCD8xq1xayXujFGOP4ztcuM4wsD0s", 
                   "title": "Platform Overview", 
                   "agendaTitle": "Platform Overview",
                   "slides": 1
             },
             {
-                  "order": 4,
+                  "order": 5,
                   "google_id": "1l06tQGSWoodk70Pi_zNNrcYBVjTk3mfNn621PJK3zyg", 
                   "title": "Program Management", 
                   "agendaTitle": "Program Management",
-                  "slides": 7
+                  "slides": 6
             },
             {
-                  "order": 5,
+                  "order": 6,
                   "google_id": "1lalHoAi0lDTY-glmTk90cL4wdrsDPalYPZGhIgBuibo", 
                   "title": "Web Experimentation",
                   "agendaTitle": "Web Experimentation", 
                   "slides": 6
             },
             {
-                  "order": 6,
+                  "order": 7,
                   "google_id": "1ZaYgH35n1a98hFy0IlLUuidafL4aEiysg6Wz4EMR_Kk", 
                   "title": "Web Personalization - Short", 
                   "agendaTitle": "Web Personalization",
-                  "slides": 7
-            },
-            {
-                  "order": 7,
-                  "google_id": "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI", 
-                  "title": "Web Personalization - Long", 
-                  "agendaTitle": "Web Personalization",
-                  "slides": 12
+                  "slides": 8
             },
             {
                   "order": 8,
-                  "google_id": "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A", 
-                  "title": "Web Recommendations", 
-                  "agendaTitle": "Web Recommendations",
-                  "slides": 7
+                  "google_id": "1yATgaDsekF7X0hOnp-6zHkrVzJcSViiMs9imogP3fBI", 
+                  "title": "Web Personalization - Long", 
+                  "agendaTitle": "Web Personalization",
+                  "slides": 13
             },
             {
                   "order": 9,
+                  "google_id": "153dRbmyQfQolpODktB4fmqxRzv4Ya1Yjx_V1AVPYY1A", 
+                  "title": "Adaptive Recommendations", 
+                  "agendaTitle": "Adaptive Recommendations",
+                  "slides": 11
+            },
+            {
+                  "order": 10,
                   "google_id": "1a60s_pfz7zScOHUV2nGKj-30eRwPu0h3v5UMy7TXkCQ", 
                   "title": "Performance Considerations",
                   "agendaTitle": "Performance Considerations", 
                   "slides": 11
             },
             {
-                  "order": 10,
+                  "order": 11,
                   "google_id": "1F-qIqhKVNNfmI0vPTrzAnQn5eszZWST1GqL6flbuFIc", 
                   "title": "Single Page Apps", 
                   "agendaTitle": "Single Page Apps",
                   "slides": 14
             },
             {
-                  "order": 11,
+                  "order": 12,
                   "google_id": "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", 
-                  "title": "Full Stack", 
+                  "title": "Performance Edge", 
+                  "agendaTitle": "Performance Edge",
+                  "slides": 8
+            },
+            {
+                  "order": 13,
+                  "google_id": "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", 
+                  "title": "Full Stack - Short", 
+                  "agendaTitle": "Full Stack",
+                  "slides": 16
+            },
+            {
+                  "order": 14,
+                  "google_id": "1MFD5UPXvHgxBEO7zZxEOrhBWsOni0ey9Jdw05ppdPa8", 
+                  "title": "Full Stack - Long", 
                   "agendaTitle": "Full Stack",
                   "slides": 33
             },
             {
-                  "order": 12,
+                  "order": 15,
                   "google_id": "1recSXy68mBKg6m9T16nqgTfJ3jxXr1uz8Fv5dQlYhA0", 
                   "title": "Build vs. Buy",
                   "agendaTitle": "Build vs. Buy", 
                   "slides": 1
             },
             {
-                  "order": 13,
+                  "order": 16,
                   "google_id": "1T8UrXeyhq33JmI-ahFtPB8yZJ1VuiXbDSVQXD5cTxhw", 
                   "title": "Stats Engine", 
                   "agendaTitle": "Stats Engine",
                   "slides": 6
             },
             {
-                  "order": 14,
+                  "order": 17,
                   "google_id": "1JfzmtQ1hYfIiLYCAY9wbLXyUhbYzhnnTOXivp_Qrbt8", 
                   "title": "Stats Engine Story", 
                   "agendaTitle": "Stats Engine",
                   "slides": 22
             },
             {
-                  "order": 15,
+                  "order": 18,
                   "google_id": "10VC8r6xK2-ULumD2iMymKjFYB4ZKT7Bp273J3uqqVMw", 
                   "title": "Results and Reporting", 
                   "agendaTitle": "Results and Reporting",
-                  "slides": 7
+                  "slides": 9
             },
             {
-                  "order": 16,
+                  "order": 19,
+                  "google_id": "1pUcHLJOy8vK-f3JKX3SP25stkjWSJ-tpzcHmXQccX1Y", 
+                  "title": "Roadmap", 
+                  "agendaTitle": "Roadmap",
+                  "slides": 17
+            },
+            {
+                  "order": 20,
                   "google_id": "1pUcHLJOy8vK-f3JKX3SP25stkjWSJ-tpzcHmXQccX1Y", 
                   "title": "Next Steps", 
-                  "agendaTitle": "Results and Reporting",
+                  "agendaTitle": "Next Steps",
                   "slides": 2
             }
       ]
