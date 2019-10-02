@@ -221,9 +221,9 @@ export default class GoogleHelper {
             width: emu4M
           },
           transform: {
-            scaleX: 1,
-            scaleY: 1,
-            translateX: 100000,
+            scaleX: .2,
+            scaleY: .2,
+            translateX: 8000000,
             translateY: 100000,
             unit: 'EMU'
           }
