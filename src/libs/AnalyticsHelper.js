@@ -20,11 +20,20 @@ export default class AnalyticsHelper {
 
   trackState(stateName) {
     
+    window['optimizely'] = window['optimizely'] || [];
+    window['optimizely'].push({
+      type: "event",
+      eventName: stateName
+    });
+
+
     ReactGA.event({
       category: 'state',
       action: 'update',
       label: stateName
     });
+
+
   
   }
 }
