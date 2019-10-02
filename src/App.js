@@ -270,7 +270,6 @@ class App extends React.Component {
 
     this.analyticsHelper.trackState("generate clicked");
 
-
     // Track decks via analytics
     for(const deck of chosenDecks) {
       this.analyticsHelper.track(deck);
@@ -306,6 +305,9 @@ class App extends React.Component {
 
         // Update the title slide with text from our DeckBuilder
         this.updateTitleAndAgendaSlides(fileId, slides, chosenDecks, values);
+
+        // Add the customer logo
+        this.addCustomerLogoToDeck(fileId, values.logo, slides);
 
         // Check if we need to delete any slides
         if(deletedDecks.length > 0) {
@@ -380,6 +382,14 @@ class App extends React.Component {
 
     // Perform the replacements
     this.googleHelper.updateSlidesByReplacingText(fileId, replacements);
+  }
+
+  addCustomerLogoToDeck(deckId, logoURL, slides) {
+    // Find the correct slide
+    let slide = slides[0];
+
+    // Add it
+    this.googleHelper.addLogoToSlide(deckId, logoURL, slide);
   }
 
   /**

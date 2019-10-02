@@ -201,12 +201,9 @@ export default class GoogleHelper {
     });
   }
 
-  /** Add the custom logo to the first slide
-  *
-  *
-  *
-  */
-  addLogoToFirstSlide(deckId,URL,slideId){
+  addLogoToSlide(deckId, logoURL, slide){
+    let slideId = slide.objectId;
+
     var requests = [];
     var imageId = 'customerLogo';
     var emu4M = {
@@ -216,7 +213,7 @@ export default class GoogleHelper {
     requests.push({
       createImage: {
         objectId: imageId,
-        url: URL,
+        url: logoURL,
         elementProperties: {
           pageObjectId: slideId,
           size: {
@@ -235,8 +232,10 @@ export default class GoogleHelper {
     });
 
     return new Promise((resolve, reject) => {
-      console.log(requests);
-      this.batchUpdateDeck(deckId, requests).then(() => resolve());
+      this.batchUpdateDeck(deckId, requests).then(() => {
+        console.log("Added logo");
+        resolve();
+      });
     });
 
   }
