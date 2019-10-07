@@ -233,7 +233,6 @@ export default class GoogleHelper {
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {
-        console.log("Added logo");
         resolve();
       });
     });
