@@ -1,3 +1,7 @@
+## Reading Master Deck Structure
+The layout of the master deck is stored in this spreadsheet: https://docs.google.com/spreadsheets/d/1lAorVfpa8xeOMuT95lLj_I8YblvzMzy2-TlH1ttkn-A/edit#gid=0
+It is exposed as an API using this tool: https://sheety.co
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
