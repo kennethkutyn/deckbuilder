@@ -1,5 +1,4 @@
 import React from 'react';
-import decksImport from '../config/decks.json'; // TODO: pass slides from App.js??
 import {Button, Form, Input, Row, Col, Checkbox} from 'antd';
 
 const masterDeckStructure = 'https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0';
@@ -14,27 +13,30 @@ class DeckBuilderForm extends React.Component {
   constructor(props) {
     super(props);
 
-
-    //Set state of the form, decks is empty while we wait for the JSON to return with the list of sections.
-      this.state = {
-      decks:          [],                       // The current decks that the user has selected, an empty arraywhile we wait for the JSON to return
+    // Set state of the form, decks is empty while we wait for the JSON to return with the list of sections.
+    this.state = {
+      decks:          [],                       // The current decks that the user has selected, an empty array while we wait for the JSON to return
       indeterminate:  false,                    // For the indeterminate state of the "check all" checkbox
       checkAll:       false,                    // Whether all the checkboxes are checked or not
       checkedList:    [],                       // The list of checked checkboxes (decks)
       shouldNotify:   this.props.shouldNotify,  // Whether the checkbox for "notify" should be checked or not
       logo:           null                      // The current logo (determined from the customer name)
-      };
+    };
+  }
 
+  componentDidMount() {
+    // Fetch the deck sections and lengths from: https://docs.google.com/spreadsheets/d/1lAorVfpa8xeOMuT95lLj_I8YblvzMzy2-TlH1ttkn-A/edit#gid=0
+    fetch(masterDeckStructure)
+    .then((response) => {
+      response.json()
+      .then((data) => {
+        // Get the decks and prepare them
+        let decks = this.prepareDecks(data);
 
-    //Send an XMLHttpRequest to retreive the deck sections and lengths from: https://docs.google.com/spreadsheets/d/1lAorVfpa8xeOMuT95lLj_I8YblvzMzy2-TlH1ttkn-A/edit#gid=0
-    var xhr = new XMLHttpRequest()
-    xhr.addEventListener('load', () => {
-      let decks = this.prepareDecks(JSON.parse(xhr.response));
-      this.setState({decks:decks});   
-    })
-    xhr.open('GET', masterDeckStructure);
-    xhr.send();
-
+        // Update the state of the form with the new decks
+        this.setState({ decks });
+      });
+    });
   }
 
   /**
