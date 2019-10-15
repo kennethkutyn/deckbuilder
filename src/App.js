@@ -42,11 +42,9 @@ class App extends React.Component {
       googleLoaded:       false,  // Whether the Google SDK has loaded yet
       loggedIn:           null,   // Whether the user is successfully logged in to Google or not
       team:               'se',   // This could be used in the future to build other team's decks
-      destinationFolder:  null,   // This is the folder id for the chosen Drive folder
+      folder:             null,   // This is the folder id for the chosen Drive folder
       googleUsername:     null,   // This is the user's name for the welcome message
-      deckUrl:            null,   // The ID of the new presentation so we can link to it at the end
-      notifsAllowed:      false,  // Whether notifications are allowed based on browser permissions
-      shouldNotify:       true    // Whether the user wants us to notify them or not
+      deckUrl:            null    // The ID of the new presentation so we can link to it at the end
     };
 
     // Load the Google Helper for use in this component
@@ -83,20 +81,15 @@ class App extends React.Component {
   render() {
     // Set up the current state of the component for the rendering below
     // This is just to make the following code more manageable
-    const loggedIn        = this.state.loggedIn,
-          googleUsername  = this.state.googleUsername,
-          folder          = this.state.destinationFolder,
-          folderName      = folder !== null ? folder.name : "",
-          deckUrl         = this.state.deckUrl,
-          team            = this.state.team,
-          notifsAllowed   = this.state.notifsAllowed,
-          shouldNotify    = this.state.shouldNotify;
+    const { loggedIn, googleUsername, folder, deckUrl, team } = this.state;
+
+    const folderName = (folder !== null) ? folder.name : "";
 
     return (
       <Router>
         <AppLayout
           username={googleUsername}
-          folderName={folder ? folder.name : null} 
+          folderName={folderName} 
         >
           {loggedIn ? (
             <Switch>
@@ -172,7 +165,7 @@ class App extends React.Component {
 
   handleFolderChosen(folder) {
     this.setState({
-      destinationFolder: folder
+      folder: folder
     });
   }
 }
