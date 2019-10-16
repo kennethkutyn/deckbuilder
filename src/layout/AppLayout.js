@@ -1,5 +1,6 @@
-import React from 'react';
-import logo  from '../logo.svg'
+import React          from 'react';
+import { withRouter } from 'react-router-dom';
+import logo           from '../logo.svg'
 
 import {
   Layout,
@@ -13,10 +14,15 @@ const {Title}     = Typography;
 const {Step}            = Steps;
 
 class AppLayout extends React.Component {
+
+  state = {
+    step: 0
+  };
   
   render() {
     const username    = this.props.username || "";
     const folderName  = this.props.folderName || "";
+    const pathname    = this.props.location.pathname;
 
     return (
       <Layout className="app">
@@ -39,10 +45,11 @@ class AppLayout extends React.Component {
               style={{marginBottom: 25}}
             >Optimizely SE Deck Builder</Title>
 
-            <Steps size="small" current={0} style={{marginBottom: 25}}>
+            <Steps size="small" current={this.getCurrentStep(pathname)} style={{marginBottom: 25}}>
               <Step title="Login to Google" description={username} />
               <Step title="Choose folder" description={folderName ? folderName : ""} />
               <Step title="Configure Slides" />
+              <Step title="Finish" />
             </Steps>
             
             {this.props.children}
@@ -53,6 +60,22 @@ class AppLayout extends React.Component {
     );
   }
 
+  getCurrentStep(pathname) {
+    if(pathname === "/choose-folder") {
+      return 1;
+    }
+
+    if(pathname === "/deck-builder") {
+      return 2;
+    }
+
+    if(pathname === "/success") {
+      return 3;
+    }
+
+    return 0;
+  }
+
 }
 
-export default AppLayout;
+export default withRouter(AppLayout);
