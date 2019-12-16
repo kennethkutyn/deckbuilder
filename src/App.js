@@ -18,12 +18,9 @@ import {
 } from "react-router-dom";
 
 // Pages
-import ChooseFolder from './layout/pages/ChooseFolder.js';
-import DeckBuilder  from './layout/pages/DeckBuilder.js';
-import SuccessPage  from './layout/pages/SuccessPage.js';
-
-// CSS
-import './App.css'; 
+import ChooseFolder from './pages/ChooseFolder.js';
+import DeckBuilder  from './pages/DeckBuilder.js';
+import SuccessPage  from './pages/SuccessPage.js';
 
 const {Text} = Typography;
 

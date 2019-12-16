@@ -1,6 +1,8 @@
-export const deckBuilderUpdates = {
-  STARTED:            "started",
+export const generatorStatus = {
+  PRESTART:           "prestart",
+  BACKGROUND:         "background processing",
   ACCESSING_NEW_DECK: "accessing new deck",
+  WAITING:            "waiting",
   CONFIGURING_SLIDES: "configuring slides",
   DECK_SELECTED:      "deck selected",
   FINISHED:           "finished"
@@ -8,72 +10,132 @@ export const deckBuilderUpdates = {
 
 export default class DeckGenerator {
 
+  /**
+   * Queue for functions that are waiting for a promise to resolve.
+   * @type {Array}
+   */
+  queue = [];
+
+  /**
+   * Are we ready to process any file functions?
+   * @type {Boolean}
+   */
+  ready = false;
+
+  /**
+   * The temp deck object once it's been copied
+   * @type {[type]}
+   */
+  tempDeck = null;
+
+  /**
+   * The fileId for the temp deck
+   * @type {[type]}
+   */
+  fileId = null;
+
+  status = generatorStatus.PRESTART;
+
   constructor(googleHelper, updateListener, folderId) {
     this.googleHelper   = googleHelper;
     this.updateListener = updateListener || console.log;
     this.folderId       = folderId
   }
-  
-  /**
-   * Handle the "generate" button click and start processing the new
-   *   presentation with google
-   * @param  {object} values        The values returned by the form
-   * @param  {array} originalDecks  The original list of decks from the
-   *                                deckbuilder
-   * @return {null}               
-   */
-  generate(values, chosenDecks, deletedDecks) {
-    // Send update
-    this.updateListener(deckBuilderUpdates.STARTED);
 
+  _queue(f) {
+    // Either run now, or add to array 
+    if(this.ready) {
+      f();
+    }
+    else {
+      this.queue.push(f);
+    }
+  }
+
+  _updateStatus(status, info) {
+    this.status = status;
+    this.updateListener(status, info);
+  }
+
+  start() {
+    this._updateStatus(generatorStatus.BACKGROUND);
+
+    // Set temp filename with timestamp so we can remove it later
+    const tempFilename = "~$deckbuilder-" + (new Date().getTime());
+
+    // Set ready to `false` so no other actions will run until the deck is in place
+    this.ready = false;
+
+    // Copy the master deck into the destination folder
+    this.googleHelper.copyMasterDeck(tempFilename, this.folderId)
+    .then((fileId) => {
+      // Update the file ID
+      this.fileId = fileId;
+
+      this._updateStatus(generatorStatus.ACCESSING_NEW_DECK, {fileId});
+
+      // Get the deck for use later...
+      this.googleHelper.getPresentation(fileId)
+      .then(deck => {
+        this.tempDeck = deck;
+
+        // Set waiting state
+        this._updateStatus(generatorStatus.WAITING);
+
+        // Run through the queue and run any functions we need...
+        while (this.queue.length > 0) {
+          // Shift removes from the array too
+          (this.queue.shift())();   
+        }
+
+        // Set ready state
+        this.ready = true;
+      });
+    })
+    .catch(error => { console.log(error); });
+  }
+
+  generate(values, chosenDecks, deletedDecks, errorCallback) {
     // Track decks via analytics
     for(const deck of chosenDecks) {
-      this.updateListener(deckBuilderUpdates.DECK_SELECTED, { deck });
+      this._updateStatus(generatorStatus.DECK_SELECTED, { deck });
     }
 
     // Get relevant variables from the values object
-    const customerName  = values.customer_name;
+    const customerName = values.customer_name;
 
     // Generate deck filename
     const filename = this.generateFilename(customerName);
 
-    // Copy the master deck into the destination folder
-    this.googleHelper.copyMasterDeck(filename, this.folderId)
-    .then((fileId) => {
+    // Wait till we are ready...
+    this._queue(() => {
+      this._updateStatus(generatorStatus.CONFIGURING_SLIDES);
 
-      this.updateListener(deckBuilderUpdates.ACCESSING_NEW_DECK, { fileId });
+      // Get the slides out of this presentation
+      const slides = this.tempDeck.slides;
 
-      // Get the presentation slides
-      this.googleHelper.getPresentation(fileId)
-      .then((masterDeck) => {
+      // Update the title slide with text from our DeckBuilder
+      this.updateTitleAndAgendaSlides(this.fileId, slides, chosenDecks, values);
 
-        this.updateListener(deckBuilderUpdates.CONFIGURING_SLIDES);
+      // Add the customer logo
+      this.addCustomerLogoToDeck(this.fileId, values.logo, slides);
 
-        // Get the slides out of this presentation
-        const slides = masterDeck.slides;
+      // Update the filename
+      this.googleHelper.updateFilename(this.fileId, filename);
 
-        // Update the title slide with text from our DeckBuilder
-        this.updateTitleAndAgendaSlides(fileId, slides, chosenDecks, values);
-
-        // Add the customer logo
-        this.addCustomerLogoToDeck(fileId, values.logo, slides);
-
-        // Check if we need to delete any slides
-        if(deletedDecks.length > 0) {
-          // Delete unnecessary slides
-          this.deleteSlides(fileId, slides, deletedDecks)
-          .then(() => { 
-            // Call to finish
-            this.updateListener(deckBuilderUpdates.FINISHED);
-          });
-        }
-        else {
-          // No slides need to be deleted, we can just finish
-          this.updateListener(deckBuilderUpdates.FINISHED);
-        }
-
-      });
-
+      // Check if we need to delete any slides
+      if(deletedDecks.length > 0) {
+        // Delete unnecessary slides
+        this.deleteSlides(this.fileId, slides, deletedDecks)
+        .then(() => { 
+          // Call to finish
+          this._updateStatus(generatorStatus.FINISHED);
+        });
+      }
+      else {
+        // No slides need to be deleted, we can just finish
+        this._updateStatus(generatorStatus.FINISHED);
+      }
     });
   }
 

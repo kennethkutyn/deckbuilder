@@ -1,8 +1,8 @@
 import React                                from 'react';
 import { Redirect }                         from 'react-router-dom';
-import AnalyticsHelper                      from '../../libs/AnalyticsHelper.js';
-import NotificationHelper                   from '../../libs/NotificationHelper.js';
-import DeckGenerator, {deckBuilderUpdates}  from '../../libs/DeckGenerator.js';
+import AnalyticsHelper                      from '../libs/AnalyticsHelper.js';
+import NotificationHelper                   from '../libs/NotificationHelper.js';
+import DeckGenerator, { generatorStatus }   from '../libs/DeckGenerator.js';
 
 import {
   Button, 
@@ -11,12 +11,20 @@ import {
   Row, 
   Col, 
   Checkbox,
-  Spin
+  Spin,
+  Modal
 } from 'antd';
+
+const statusMessages = {};
+statusMessages[generatorStatus.BACKGROUND]             = "Copying master deck to new location";
+statusMessages[generatorStatus.ACCESSING_NEW_DECK]  = "Reading new deck";
+statusMessages[generatorStatus.CONFIGURING_SLIDES]  = "Configuring slides (this may take some time)";
 
 const masterDeckStructure = 'https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0';
 
 class DeckBuilder extends React.Component {
+
+  deckGenerator = null;
 
   /**
    * Constructor
@@ -36,8 +44,10 @@ class DeckBuilder extends React.Component {
       checkAll:           false,  // Whether all the checkboxes are checked or not
       checkedList:        [],     // The list of checked checkboxes (decks)
       logo:               null,   // The current logo (determined from the customer name)
+      generating:         false,  // Should we be hiding the screen and showing a spinner?
       generatingMessage:  null,   // The message that should be shown when the deck is generating
       redirect:           false,  // Redirect to the last stage
+      errorMessage:       null,
       shouldNotify:       this.notificationHelper.granted() // Whether the checkbox for "notify" should be checked or not
     };
 
@@ -58,6 +68,15 @@ class DeckBuilder extends React.Component {
         this.setState({ decks });
       });
     });
+
+    // Set up the deck generator and start it up:
+    this.deckGenerator = new DeckGenerator(
+      this.props.googleHelper, 
+      (update, info) => this.deckGeneratorUpdate(update, info),
+      this.props.folder.id
+    );
+
+    this.deckGenerator.start();
   }
 
   /**
@@ -78,12 +97,27 @@ class DeckBuilder extends React.Component {
     if(!this.props.folder) return <Redirect to="/" />;
 
     const { getFieldDecorator } = this.props.form;
-    const { generatingMessage } = this.state;
-    const generating = typeof generatingMessage === "string";
+    const { generatingMessage, errorMessage, generating } = this.state;
 
     return (
       <Spin tip={generatingMessage} spinning={generating}>
         <Form hideRequiredMark={true} onSubmit={(e) => this.handleSubmit(e)}>
+          
+          {/* Error modal */}
+          <Modal
+            title="Oh no! There's been an error!"
+            visible={errorMessage !== null}
+            onOk={() => {
+              this.setState({
+                errorMessage: null
+              });
+            }}
+          >
+            <p>There has been an error. Please send the below error message to Ken K or Thomas C on slack!!</p>
+            <pre>{errorMessage}</pre>
+          </Modal>
+          {/* End error modal */}
+
           <Row gutter={{xs: 0, sm: 32}}>
             <Col xs={24} sm={12} md={10} lg={8}>
 
@@ -304,15 +338,20 @@ class DeckBuilder extends React.Component {
         // Add the customer logo to the values array
         values.logo = this.state.logo; 
 
-        // Create the DeckGenerator
-        let deckGenerator = new DeckGenerator(
-          this.props.googleHelper, 
-          (update, info) => this.deckGeneratorUpdate(update, info),
-          this.props.folder.id
-        );
-
         // Start the deck generator
-        deckGenerator.generate(values, chosenDecks, deletedDecks);
+        this.deckGenerator.generate(values, chosenDecks, deletedDecks, (err) => {
+          this.setState({
+            errorMessage: JSON.stringify(err, null, 1)
+          });
+        });
+
+        // Set the state to loading so we hide the form
+        this.setState({
+          generating: true
+        })
+
+        // Track
+        this.analyticsHelper.trackState("generate clicked");
       }
     });
   }
@@ -362,54 +401,37 @@ class DeckBuilder extends React.Component {
     this.abortControllers_.push(abortController);
   }
 
-  deckGeneratorUpdate(update, info) {
-    switch(update) {
-      case deckBuilderUpdates.STARTED:
-        this.setState({
-          generatingMessage: "Copying master deck to new location"
-        });
-
-        this.analyticsHelper.trackState("generate clicked");
-      break;
-
-      case deckBuilderUpdates.DECK_SELECTED:
-        this.analyticsHelper.track(info.deck);
-      break;
-
-      case deckBuilderUpdates.ACCESSING_NEW_DECK:
-        this.setState({
-          generatingMessage: "Accessing new presentation",
-          deckUrl: "https://docs.google.com/presentation/d/" + info.fileId
-        });
-      break;
-
-      case deckBuilderUpdates.CONFIGURING_SLIDES:
-        this.setState({
-          generatingMessage: "Configuring slides (this may take a while)"
-        });
-      break;
-
-      case deckBuilderUpdates.FINISHED:
-        this.analyticsHelper.trackState("finished generating");
-
-        // Send notification
-        this.notificationHelper.notify(
-          "Optimizely Deck Builder",
-          "Your deck is ready; click here to open.",
-          "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"
-        );
-
-        // Redirect to final stage
-        this.setState({
-          redirect: true
-        });
-
-      default:
-        this.setState({
-          generatingMessage: null
-        });
-      break;
+  deckGeneratorUpdate(status, info) {
+    // Set the loading spinner message
+    if(typeof statusMessages[status] !== "undefined") {
+      this.setState({
+        generatingMessage: statusMessages[status]
+      });
     }
+
+    // Set deckURL when new deck has been accessed
+    if(status === generatorStatus.ACCESSING_NEW_DECK) {
+      this.setState({
+        deckUrl: "https://docs.google.com/presentation/d/" + info.fileId
+      });
+    }
+
+    // Complete deckbuilder when finished
+    if(status === generatorStatus.FINISHED) {
+      this.analyticsHelper.trackState("finished generating");
+
+      // Send notification
+      this.notificationHelper.notify(
+        "Optimizely Deck Builder",
+        "Your deck is ready; click here to open.",
+        "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"
+      );
+
+      // Redirect to final stage
+      this.setState({
+        redirect: true
+      });
+    } 
   }
 
 }

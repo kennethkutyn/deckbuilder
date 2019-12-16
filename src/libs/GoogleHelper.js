@@ -152,11 +152,10 @@ export default class GoogleHelper {
    * @param  {string} destinationFolder Folder id for where the new master deck should be copied to
    * @return {Promise}                  Promise
    */
-  copyMasterDeck(filename, destinationFolder) {
-    return new Promise((resolve, reject) => {
-      this.loadDriveClient()
+  copyMasterDeck(filename, destinationFolder, tries = 0) {
+    return this.loadDriveClient()
       .then(() => {
-        window.gapi.client.drive.files.copy({
+        return window.gapi.client.drive.files.copy({
           "fileId": this.masterDeckId,
           "resource": {
             "name": filename,
@@ -165,9 +164,32 @@ export default class GoogleHelper {
             ]
           }
         })
-        .then((response) => resolve(response.result.id));
+        .then((response) => response.result.id)
+        .catch((err) => {
+          console.log("Error with copying master deck: ", err);
+          if(tries < 3) {
+            console.log("Retrying");
+            return this.copyMasterDeck(filename, destinationFolder, tries+1);
+          }
+          else {
+            console.log("Giving up");
+            throw(err);
+          }
+        });
       });
-    });
+  }
+
+  updateFilename(deckId, newFilename) {
+    return new Promise((resolve, reject) => {
+      window.gapi.client.drive.files.update({
+        'fileId': deckId,
+        'name' : newFilename
+      })
+      .then(done => resolve(done))
+      .catch(err => {
+        console.log(err);
+      });
+    })
   }
 
   /**
