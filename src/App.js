@@ -6,8 +6,7 @@ import {
   Typography, 
   message,
   Icon,
-  Button,
-  Result
+  Button
 } from 'antd';
 
 import {
@@ -78,7 +77,7 @@ class App extends React.Component {
   render() {
     // Set up the current state of the component for the rendering below
     // This is just to make the following code more manageable
-    const { loggedIn, googleUsername, folder, deckUrl, team } = this.state;
+    const { loggedIn, googleUsername, folder, team } = this.state;
 
     const folderName = (folder !== null) ? folder.name : "";
 
