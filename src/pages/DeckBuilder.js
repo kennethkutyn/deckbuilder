@@ -424,7 +424,8 @@ class DeckBuilder extends React.Component {
       this.notificationHelper.notify(
         "Optimizely Deck Builder",
         "Your deck is ready; click here to open.",
-        "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png"
+        "https://upload.wikimedia.org/wikipedia/en/thumb/e/e9/Optimizely_Logo.png/220px-Optimizely_Logo.png",
+        this.state.deckUrl
       );
 
       // Redirect to final stage

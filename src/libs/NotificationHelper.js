@@ -33,6 +33,9 @@ export default class NotificationHelper {
         "body": body,
         "icon": iconURL
       });
+      notif.onclick = function() {
+        window.open(openURL);
+      }
     }
   }
 
