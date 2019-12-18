@@ -1,29 +1,22 @@
-import React                                from 'react';
-import { Redirect }                         from 'react-router-dom';
-import AnalyticsHelper                      from '../libs/AnalyticsHelper.js';
-import NotificationHelper                   from '../libs/NotificationHelper.js';
-import DeckGenerator, { generatorStatus }   from '../libs/DeckGenerator.js';
+import React from "react";
+import { Redirect } from "react-router-dom";
+import AnalyticsHelper from "../libs/AnalyticsHelper.js";
+import NotificationHelper from "../libs/NotificationHelper.js";
+import DeckGenerator, { generatorStatus } from "../libs/DeckGenerator.js";
 
-import {
-  Button, 
-  Form, 
-  Input, 
-  Row, 
-  Col, 
-  Checkbox,
-  Spin,
-  Modal
-} from 'antd';
+import { Button, Form, Input, Row, Col, Checkbox, Spin, Modal } from "antd";
 
 const statusMessages = {};
-statusMessages[generatorStatus.BACKGROUND]             = "Copying master deck to new location";
-statusMessages[generatorStatus.ACCESSING_NEW_DECK]  = "Reading new deck";
-statusMessages[generatorStatus.CONFIGURING_SLIDES]  = "Configuring slides (this may take some time)";
+statusMessages[generatorStatus.BACKGROUND] =
+  "Copying master deck to new location";
+statusMessages[generatorStatus.ACCESSING_NEW_DECK] = "Reading new deck";
+statusMessages[generatorStatus.CONFIGURING_SLIDES] =
+  "Configuring slides (this may take some time)";
 
-const masterDeckStructure = 'https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0';
+const masterDeckStructure =
+  "https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0";
 
 class DeckBuilder extends React.Component {
-
   deckGenerator = null;
 
   /**
@@ -39,16 +32,16 @@ class DeckBuilder extends React.Component {
 
     // Set state of the form, decks is empty while we wait for the JSON to return with the list of sections.
     this.state = {
-      decks:              [],     // The current decks that the user has selected, an empty array while we wait for the JSON to return
-      indeterminate:      false,  // For the indeterminate state of the "check all" checkbox
-      checkAll:           false,  // Whether all the checkboxes are checked or not
-      checkedList:        [],     // The list of checked checkboxes (decks)
-      logo:               null,   // The current logo (determined from the customer name)
-      generating:         false,  // Should we be hiding the screen and showing a spinner?
-      generatingMessage:  null,   // The message that should be shown when the deck is generating
-      redirect:           false,  // Redirect to the last stage
-      errorMessage:       null,
-      shouldNotify:       this.notificationHelper.granted() // Whether the checkbox for "notify" should be checked or not
+      decks: [], // The current decks that the user has selected, an empty array while we wait for the JSON to return
+      indeterminate: false, // For the indeterminate state of the "check all" checkbox
+      checkAll: false, // Whether all the checkboxes are checked or not
+      checkedList: [], // The list of checked checkboxes (decks)
+      logo: null, // The current logo (determined from the customer name)
+      generating: false, // Should we be hiding the screen and showing a spinner?
+      generatingMessage: null, // The message that should be shown when the deck is generating
+      redirect: false, // Redirect to the last stage
+      errorMessage: null,
+      shouldNotify: this.notificationHelper.granted() // Whether the checkbox for "notify" should be checked or not
     };
 
     // Create an analytics helper
@@ -57,10 +50,8 @@ class DeckBuilder extends React.Component {
 
   componentDidMount() {
     // Fetch the deck sections and lengths from: https://docs.google.com/spreadsheets/d/1lAorVfpa8xeOMuT95lLj_I8YblvzMzy2-TlH1ttkn-A/edit#gid=0
-    fetch(masterDeckStructure)
-    .then((response) => {
-      response.json()
-      .then((data) => {
+    fetch(masterDeckStructure).then(response => {
+      response.json().then(data => {
         // Get the decks and prepare them
         let decks = this.prepareDecks(data);
 
@@ -71,7 +62,7 @@ class DeckBuilder extends React.Component {
 
     // Set up the deck generator and start it up:
     this.deckGenerator = new DeckGenerator(
-      this.props.googleHelper, 
+      this.props.googleHelper,
       (update, info) => this.deckGeneratorUpdate(update, info),
       this.props.folder.id
     );
@@ -85,24 +76,26 @@ class DeckBuilder extends React.Component {
    */
   render() {
     // Redirect if we've finished (to the success page)
-    if(this.state.redirect)
+    if (this.state.redirect)
       return (
-        <Redirect push to={{ 
-          pathname: "/success", 
-          state: {deckUrl: this.state.deckUrl}
-        }} />
+        <Redirect
+          push
+          to={{
+            pathname: "/success",
+            state: { deckUrl: this.state.deckUrl }
+          }}
+        />
       );
 
     // Redirect if we don't have enough info
-    if(!this.props.folder) return <Redirect to="/" />;
+    if (!this.props.folder) return <Redirect to="/" />;
 
     const { getFieldDecorator } = this.props.form;
     const { generatingMessage, errorMessage, generating } = this.state;
 
     return (
       <Spin tip={generatingMessage} spinning={generating}>
-        <Form hideRequiredMark={true} onSubmit={(e) => this.handleSubmit(e)}>
-          
+        <Form hideRequiredMark={true} onSubmit={e => this.handleSubmit(e)}>
           {/* Error modal */}
           <Modal
             title="Oh no! There's been an error!"
@@ -113,29 +106,37 @@ class DeckBuilder extends React.Component {
               });
             }}
           >
-            <p>There has been an error. Please send the below error message to Ken K or Thomas C on slack!!</p>
+            <p>
+              There has been an error. Please send the below error message to
+              Ken K or Thomas C on slack!!
+            </p>
             <pre>{errorMessage}</pre>
           </Modal>
           {/* End error modal */}
 
-          <Row gutter={{xs: 0, sm: 32}}>
+          <Row gutter={{ xs: 0, sm: 32 }}>
             <Col xs={24} sm={12} md={10} lg={8}>
-
               <Row gutter={16}>
                 <Col span={18}>
                   <Form.Item label="Customer Name">
-                    {getFieldDecorator('customer_name', {
-                      rules: [{ required: true, message: 'Please input a customer name!', whitespace: true }]
-                    })(<Input onBlur={(e)=>this.handleCompanyNameChange(e)} />)}
+                    {getFieldDecorator("customer_name", {
+                      rules: [
+                        {
+                          required: true,
+                          message: "Please input a customer name!",
+                          whitespace: true
+                        }
+                      ]
+                    })(<Input onBlur={e => this.handleCompanyNameChange(e)} />)}
                   </Form.Item>
                 </Col>
                 <Col span={6}>
                   {typeof this.state.logo !== "undefined" && (
-                    <img 
+                    <img
                       alt=""
-                      src={this.state.logo} 
+                      src={this.state.logo}
                       style={{
-                        width: '100%'
+                        width: "100%"
                       }}
                     />
                   )}
@@ -143,14 +144,26 @@ class DeckBuilder extends React.Component {
               </Row>
 
               <Form.Item label="AE Name">
-                {getFieldDecorator('ae_name', {
-                  rules: [{ required: true, message: 'Please input an AE name!', whitespace: true }]
+                {getFieldDecorator("ae_name", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "Please input an AE name!",
+                      whitespace: true
+                    }
+                  ]
                 })(<Input />)}
               </Form.Item>
 
               <Form.Item label="SE Name">
-                {getFieldDecorator('se_name', {
-                  rules: [{ required: true, message: 'Please input an SE name!', whitespace: true }],
+                {getFieldDecorator("se_name", {
+                  rules: [
+                    {
+                      required: true,
+                      message: "Please input an SE name!",
+                      whitespace: true
+                    }
+                  ],
                   initialValue: this.props.seName
                 })(<Input />)}
               </Form.Item>
@@ -158,35 +171,43 @@ class DeckBuilder extends React.Component {
               <Form.Item label="Sections">
                 <Checkbox
                   indeterminate={this.state.indeterminate}
-                  onChange={(e) => this.onCheckAllChange(e)}
+                  onChange={e => this.onCheckAllChange(e)}
                   checked={this.state.checkAll}
                 >
                   Check all
                 </Checkbox>
-                {getFieldDecorator('decks', {
-                  rules: [{
-                    validator: (rule, value, callback) => {
-                      // Check that this is an array and that it has a length
-                      if(typeof value === "object" && value.length > 0){
-                        callback();
-                      }
-                      // If it doesn't, return false to the callback
-                      else {
-                        callback(false);
-                      }
-                    }, 
-                    message: 'Please choose at least one slide template', whitespace: true
-                  }]
+                {getFieldDecorator("decks", {
+                  rules: [
+                    {
+                      validator: (rule, value, callback) => {
+                        // Check that this is an array and that it has a length
+                        if (typeof value === "object" && value.length > 0) {
+                          callback();
+                        }
+                        // If it doesn't, return false to the callback
+                        else {
+                          callback(false);
+                        }
+                      },
+                      message: "Please choose at least one slide template",
+                      whitespace: true
+                    }
+                  ]
                 })(
-                  <Checkbox.Group style={{ width: '100%' }} onChange={(checkedList) => this.onChange(checkedList)}>
+                  <Checkbox.Group
+                    style={{ width: "100%" }}
+                    onChange={checkedList => this.onChange(checkedList)}
+                  >
                     {this.state.decks.map((value, index) => {
-                      return(
+                      return (
                         <Row key={index}>
                           <Col span={24}>
-                            <Checkbox value={value.order}>{value.title} ({value.slides} slides)</Checkbox>
+                            <Checkbox value={value.order}>
+                              {value.title} ({value.slides} slides)
+                            </Checkbox>
                           </Col>
                         </Row>
-                      )
+                      );
                     })}
                   </Checkbox.Group>
                 )}
@@ -194,19 +215,23 @@ class DeckBuilder extends React.Component {
 
               {!this.notificationHelper.blocked() && (
                 <Form.Item label="Notifications">
-                  {getFieldDecorator('notify', {
-                    valuePropName: 'checked',
+                  {getFieldDecorator("notify", {
+                    valuePropName: "checked",
                     initialValue: this.state.shouldNotify
                   })(
-                    <Checkbox onChange={(e) => this.notifyChange(e)}>Notify me when done</Checkbox>
+                    <Checkbox onChange={e => this.notifyChange(e)}>
+                      Notify me when done
+                    </Checkbox>
                   )}
                 </Form.Item>
               )}
             </Col>
           </Row>
 
-          <div className="steps-action" style={{marginTop: 25}}>
-            <Button htmlType="submit" type="primary">Generate Deck</Button> 
+          <div className="steps-action" style={{ marginTop: 25 }}>
+            <Button htmlType="submit" type="primary">
+              Generate Deck
+            </Button>
           </div>
         </Form>
       </Spin>
@@ -221,7 +246,7 @@ class DeckBuilder extends React.Component {
   prepareDecks(decks) {
     // Lets take the list of decks and add an "offset" to them so we can easily delete them in the future
     let currOffset = 0;
-    for(var i = 0; i < decks.length; i++) {
+    for (var i = 0; i < decks.length; i++) {
       // Add the current offset into the decks array
       decks[i]["offset"] = currOffset;
 
@@ -235,11 +260,11 @@ class DeckBuilder extends React.Component {
   /**
    * Handle the user checking/unchecking the "notify" checkbox
    * @param  {object} e Event object (get target with e.target)
-   * @return {null}  
+   * @return {null}
    */
   notifyChange(e) {
     // If blocked we shouldn't be able to get here as the element shouldn't be shown
-    if(this.notificationHelper.blocked()) {
+    if (this.notificationHelper.blocked()) {
       this.setState({ shouldNotify: false });
       return;
     }
@@ -247,14 +272,13 @@ class DeckBuilder extends React.Component {
     let checked = e.target.checked;
 
     // Check if the user wants notifications but doesn't have them enabled
-    if(checked && !this.notificationHelper.granted()) {
+    if (checked && !this.notificationHelper.granted()) {
       // We need to ask them to enable notifications
-      this.notificationHelper.request().then((granted) => {
+      this.notificationHelper.request().then(granted => {
         // We know the user wants notifications, so it's up to whether they enabled or not
         this.toggleNotifications(granted);
-      });  
-    }
-    else {
+      });
+    } else {
       // Either box unchecked (no notifications) or box checked
       // and user has already granted (want notifications)
       // so either way we can use the `checked` variable...
@@ -277,15 +301,16 @@ class DeckBuilder extends React.Component {
     // Set the state of the component to reflect the checkboxes that have been ticked
     this.setState({
       checkedList,
-      indeterminate:  !!checkedList.length && checkedList.length < this.state.decks.length,
-      checkAll:       checkedList.length === this.state.decks.length,
+      indeterminate:
+        !!checkedList.length && checkedList.length < this.state.decks.length,
+      checkAll: checkedList.length === this.state.decks.length
     });
   }
 
   /**
    * Handle someone checking/unchecking the "check all" checkbox
    * @param  {object} e The checkbox event
-   * @return {null}   
+   * @return {null}
    */
   onCheckAllChange(e) {
     // Get a list of all the checkbox values we need to tick
@@ -296,8 +321,8 @@ class DeckBuilder extends React.Component {
     this.props.form.setFields({
       decks: {
         value: e.target.checked ? checkboxes : [] // Empty array means all boxes are unchecked
-      },
-    }); 
+      }
+    });
 
     // Set the state of the component
     this.setState({
@@ -310,36 +335,35 @@ class DeckBuilder extends React.Component {
   /**
    * Handle the user clicking "generate" or submitting the form
    * @param  {object} e The form submit event
-   * @return {null}   
+   * @return {null}
    */
   handleSubmit(e) {
     // Stop the form from actually submitting
     e.preventDefault();
-    
+
     // Validate the form (this returns either an error or the values from the form)
     this.props.form.validateFields((err, values) => {
       // Check that there's no error (the form will handle itself if there's an error)
       if (!err) {
         let deletedDecks = [],
-            chosenDecks  = [];
+          chosenDecks = [];
 
         // Run through the original decks and create new lists for chosen and deleted slides
-        for(const deck of this.state.decks) {
-          if(values.decks.indexOf(deck.order) < 0) {
+        for (const deck of this.state.decks) {
+          if (values.decks.indexOf(deck.order) < 0) {
             // This slide hasn't been chosen and should be added to deleted array
             deletedDecks.push(deck);
-          }
-          else {
+          } else {
             // This slide has been chosen so should be added to chosen array
             chosenDecks.push(deck);
           }
         }
 
         // Add the customer logo to the values array
-        values.logo = this.state.logo; 
+        values.logo = this.state.logo;
 
         // Start the deck generator
-        this.deckGenerator.generate(values, chosenDecks, deletedDecks, (err) => {
+        this.deckGenerator.generate(values, chosenDecks, deletedDecks, err => {
           this.setState({
             errorMessage: JSON.stringify(err, null, 1)
           });
@@ -348,7 +372,7 @@ class DeckBuilder extends React.Component {
         // Set the state to loading so we hide the form
         this.setState({
           generating: true
-        })
+        });
 
         // Track
         this.analyticsHelper.trackState("generate clicked");
@@ -359,43 +383,46 @@ class DeckBuilder extends React.Component {
   /**
    * Handle when the company name changes and the field blurs
    * @param  {object} e The event from the blur event
-   * @return {null}   
+   * @return {null}
    */
   handleCompanyNameChange(e) {
     // Get the value
     let partial = e.target.value;
 
     // Create an abort controller array
-    if(typeof this.abortControllers_ === "undefined") {
+    if (typeof this.abortControllers_ === "undefined") {
       this.abortControllers_ = [];
     }
 
     // Lets abort all the earlier abortControllers
-    for(const abortController of this.abortControllers_) {
+    for (const abortController of this.abortControllers_) {
       abortController.abort();
     }
 
     // Create a new abort controller for this fetch
     let abortController = new AbortController();
-    
-    // Fetch the autocomplete suggestions
-    fetch("https://autocomplete.clearbit.com/v1/companies/suggest?query=" + partial, {
-      method: "get",
-      signal: abortController.signal
-    })
-    .then((response) => response.json())
-    .then((response) => {
-      // Get the first image
-      let logo = response[0].logo;
 
-      // Set the state
-      this.setState({
-        logo: logo
+    // Fetch the autocomplete suggestions
+    fetch(
+      "https://autocomplete.clearbit.com/v1/companies/suggest?query=" + partial,
+      {
+        method: "get",
+        signal: abortController.signal
+      }
+    )
+      .then(response => response.json())
+      .then(response => {
+        // Get the first image
+        let logo = response[0].logo;
+
+        // Set the state
+        this.setState({
+          logo: logo
+        });
+      })
+      .catch(err => {
+        console.log("Error", err);
       });
-    })
-    .catch((err) => {
-      console.log("Error", err);
-    });
 
     // Add this abort controller to the array to be aborted if necessary
     this.abortControllers_.push(abortController);
@@ -403,21 +430,21 @@ class DeckBuilder extends React.Component {
 
   deckGeneratorUpdate(status, info) {
     // Set the loading spinner message
-    if(typeof statusMessages[status] !== "undefined") {
+    if (typeof statusMessages[status] !== "undefined") {
       this.setState({
         generatingMessage: statusMessages[status]
       });
     }
 
     // Set deckURL when new deck has been accessed
-    if(status === generatorStatus.ACCESSING_NEW_DECK) {
+    if (status === generatorStatus.ACCESSING_NEW_DECK) {
       this.setState({
         deckUrl: "https://docs.google.com/presentation/d/" + info.fileId
       });
     }
 
     // Complete deckbuilder when finished
-    if(status === generatorStatus.FINISHED) {
+    if (status === generatorStatus.FINISHED) {
       this.analyticsHelper.trackState("finished generating");
 
       // Send notification
@@ -432,9 +459,8 @@ class DeckBuilder extends React.Component {
       this.setState({
         redirect: true
       });
-    } 
+    }
   }
-
 }
 
 export default Form.create()(DeckBuilder);

@@ -1,23 +1,25 @@
-import keys from '../config/google_keys.json';
+import keys from "../config/google_keys.json";
 
 export default class GoogleHelper {
-
   /**
    * Constructor function for this library
-   * @return {null} 
+   * @return {null}
    */
   constructor() {
     // Configure some of the variables for the gapis sdk
-    this.scope = "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
-    this.discoveryDocs = ["https://slides.googleapis.com/$discovery/rest?version=v1"];
-    this.masterDeckId = '1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4';
+    this.scope =
+      "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
+    this.discoveryDocs = [
+      "https://slides.googleapis.com/$discovery/rest?version=v1"
+    ];
+    this.masterDeckId = "1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4";
 
     // Hidden vars for use in getter/setter functions
     this.currentUser_ = null;
   }
   /**
    * Load the GAPIs into a script tag and append it to the body of the document
-   * @return {null} 
+   * @return {null}
    */
   load() {
     return new Promise((resolve, reject) => {
@@ -27,10 +29,9 @@ export default class GoogleHelper {
 
       // Set the onload callback
       script.onload = () => {
-        this.loadGapiModules()
-          .then(() => {
-            resolve();
-          });
+        this.loadGapiModules().then(() => {
+          resolve();
+        });
       };
 
       // Append gapi to the body of the page
@@ -38,18 +39,17 @@ export default class GoogleHelper {
     });
   }
 
-  
   /**
    * Load google api modules that are required
-   * @return {Promise} Promise 
+   * @return {Promise} Promise
    */
   loadGapiModules() {
     return new Promise((resolve, reject) => {
       // Load all the modules we need
-      window.gapi.load('auth2:picker:client',
-        () => {
-          // Init the auth2 library
-          window.gapi.client.init({ 
+      window.gapi.load("auth2:picker:client", () => {
+        // Init the auth2 library
+        window.gapi.client
+          .init({
             apiKey: keys.web.api_key,
             clientId: keys.web.client_id,
             scope: this.scope,
@@ -57,11 +57,12 @@ export default class GoogleHelper {
           })
           .then(() => {
             // Check if user is already signed in
-            this.currentUser_ = window.gapi.auth2.getAuthInstance().currentUser.get();
+            this.currentUser_ = window.gapi.auth2
+              .getAuthInstance()
+              .currentUser.get();
             resolve();
           });
-        }
-      );
+      });
     });
   }
 
@@ -72,7 +73,10 @@ export default class GoogleHelper {
   signIn() {
     return new Promise((resolve, reject) => {
       // Attempt to get the user to log in
-      window.gapi.auth2.getAuthInstance().signIn({ scope: this.scope }).then((result) => resolve());
+      window.gapi.auth2
+        .getAuthInstance()
+        .signIn({ scope: this.scope })
+        .then(result => resolve());
     });
   }
 
@@ -97,12 +101,12 @@ export default class GoogleHelper {
    * @return {string} The username if they are logged in, null if not
    */
   getUsername() {
-    if(this.currentUser_.isSignedIn()) {
+    if (this.currentUser_.isSignedIn()) {
       return this.currentUser_.w3.ig;
     }
     // TODO: replace with thrown error
     return null;
-  } 
+  }
 
   /**
    * Generates a picker view and shows it on screen to the user
@@ -110,8 +114,12 @@ export default class GoogleHelper {
    * @return {null}
    */
   createPicker(selectedFolderCallback) {
-    let view = new window.google.picker.View(window.google.picker.ViewId.FOLDERS);
-    let folderView = new window.google.picker.DocsView(window.google.picker.ViewId.FOLDERS);
+    let view = new window.google.picker.View(
+      window.google.picker.ViewId.FOLDERS
+    );
+    let folderView = new window.google.picker.DocsView(
+      window.google.picker.ViewId.FOLDERS
+    );
     folderView.setSelectFolderEnabled(true);
     view.setMimeTypes("application/vnd.google-apps.folder");
 
@@ -133,14 +141,16 @@ export default class GoogleHelper {
    */
   loadDriveClient() {
     return new Promise((resolve, reject) => {
-      if(!this.driveLoaded) {
-        window.gapi.client.load("https://content.googleapis.com/discovery/v1/apis/drive/v3/rest")
-        .then(() =>{
-          this.driveLoaded = true;
-          resolve();
-        });
-      }
-      else {
+      if (!this.driveLoaded) {
+        window.gapi.client
+          .load(
+            "https://content.googleapis.com/discovery/v1/apis/drive/v3/rest"
+          )
+          .then(() => {
+            this.driveLoaded = true;
+            resolve();
+          });
+      } else {
         resolve();
       }
     });
@@ -153,43 +163,41 @@ export default class GoogleHelper {
    * @return {Promise}                  Promise
    */
   copyMasterDeck(filename, destinationFolder, tries = 0) {
-    return this.loadDriveClient()
-      .then(() => {
-        return window.gapi.client.drive.files.copy({
-          "fileId": this.masterDeckId,
-          "resource": {
-            "name": filename,
-            "parents": [
-              destinationFolder
-            ]
+    return this.loadDriveClient().then(() => {
+      return window.gapi.client.drive.files
+        .copy({
+          fileId: this.masterDeckId,
+          resource: {
+            name: filename,
+            parents: [destinationFolder]
           }
         })
-        .then((response) => response.result.id)
-        .catch((err) => {
+        .then(response => response.result.id)
+        .catch(err => {
           console.log("Error with copying master deck: ", err);
-          if(tries < 3) {
+          if (tries < 3) {
             console.log("Retrying");
-            return this.copyMasterDeck(filename, destinationFolder, tries+1);
-          }
-          else {
+            return this.copyMasterDeck(filename, destinationFolder, tries + 1);
+          } else {
             console.log("Giving up");
-            throw(err);
+            throw err;
           }
         });
-      });
+    });
   }
 
   updateFilename(deckId, newFilename) {
     return new Promise((resolve, reject) => {
-      window.gapi.client.drive.files.update({
-        'fileId': deckId,
-        'name' : newFilename
-      })
-      .then(done => resolve(done))
-      .catch(err => {
-        console.log(err);
-      });
-    })
+      window.gapi.client.drive.files
+        .update({
+          fileId: deckId,
+          name: newFilename
+        })
+        .then(done => resolve(done))
+        .catch(err => {
+          console.log(err);
+        });
+    });
   }
 
   /**
@@ -199,38 +207,41 @@ export default class GoogleHelper {
    */
   getPresentation(fileId) {
     return new Promise((resolve, reject) => {
-      window.gapi.client.slides.presentations.get({
-        presentationId: fileId,
-      })
-      .then((response) => resolve(response.result));
+      window.gapi.client.slides.presentations
+        .get({
+          presentationId: fileId
+        })
+        .then(response => resolve(response.result));
     });
   }
 
   /**
-   * Perform a batch update to a deck on google 
+   * Perform a batch update to a deck on google
    * @param  {string} deckId  The ID of the deck that needs to be updated
    * @param  {array} updates  The updates that need to be performed
    * @return {Promise}        Promise
    */
   batchUpdateDeck(deckId, updates) {
     return new Promise((resolve, reject) => {
-      window.gapi.client.slides.presentations.batchUpdate({
-        "presentationId": deckId,
-        "resource": {
-          "requests": updates
-        }
-      }).then(() => resolve());
+      window.gapi.client.slides.presentations
+        .batchUpdate({
+          presentationId: deckId,
+          resource: {
+            requests: updates
+          }
+        })
+        .then(() => resolve());
     });
   }
 
-  addLogoToSlide(deckId, logoURL, slide){
+  addLogoToSlide(deckId, logoURL, slide) {
     let slideId = slide.objectId;
 
     var requests = [];
-    var imageId = 'customerLogo';
+    var imageId = "customerLogo";
     var emu4M = {
       magnitude: 4000000,
-      unit: 'EMU'
+      unit: "EMU"
     };
     requests.push({
       createImage: {
@@ -243,11 +254,11 @@ export default class GoogleHelper {
             width: emu4M
           },
           transform: {
-            scaleX: .2,
-            scaleY: .2,
+            scaleX: 0.2,
+            scaleY: 0.2,
             translateX: 8000000,
             translateY: 100000,
-            unit: 'EMU'
+            unit: "EMU"
           }
         }
       }
@@ -258,9 +269,7 @@ export default class GoogleHelper {
         resolve();
       });
     });
-
   }
-
 
   /**
    * Update the slides by replacing text
@@ -270,16 +279,14 @@ export default class GoogleHelper {
    */
   updateSlidesByReplacingText(deckId, options) {
     let replacements = [];
-    for(const replacement of options) {
+    for (const replacement of options) {
       replacements.push({
-        "replaceAllText": {
-          "pageObjectIds": [
-            replacement.slide.objectId
-          ],
-          "containsText": {
-            "text": replacement.searchString
+        replaceAllText: {
+          pageObjectIds: [replacement.slide.objectId],
+          containsText: {
+            text: replacement.searchString
           },
-          "replaceText": replacement.replacementString
+          replaceText: replacement.replacementString
         }
       });
     }
@@ -298,7 +305,7 @@ export default class GoogleHelper {
   deleteSlides(deckId, slideIds) {
     // Build the delete objects
     let deletions = [];
-    for(const slideId of slideIds) {
+    for (const slideId of slideIds) {
       deletions.push({
         deleteObject: {
           objectId: slideId
@@ -309,7 +316,6 @@ export default class GoogleHelper {
     return new Promise((resolve, reject) => {
       // Just need to pass it through for now
       this.batchUpdateDeck(deckId, deletions).then(() => resolve());
-    })
+    });
   }
-
 }

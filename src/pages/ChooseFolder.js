@@ -1,20 +1,14 @@
-import React from 'react';
+import React from "react";
 import { Redirect } from "react-router-dom";
 
-import {
-  Typography,
-  Icon,
-  Button,
-  Result
-} from 'antd';
+import { Typography, Icon, Button, Result } from "antd";
 
-const {Text} = Typography;
+const { Text } = Typography;
 
 class ChooseFolder extends React.Component {
-
   state = {
-    redirect:       false,
-    pickerShowing:  false
+    redirect: false,
+    pickerShowing: false
   };
 
   componentDidMount() {
@@ -30,8 +24,7 @@ class ChooseFolder extends React.Component {
       this.setState({
         redirect: true
       });
-    }
-    else if(data.action === window.google.picker.Action.CANCEL) {
+    } else if (data.action === window.google.picker.Action.CANCEL) {
       this.setState({
         pickerShowing: false
       });
@@ -39,7 +32,7 @@ class ChooseFolder extends React.Component {
   }
 
   showPicker() {
-    this.props.googleHelper.createPicker((data) => this.pickerCallback(data));
+    this.props.googleHelper.createPicker(data => this.pickerCallback(data));
 
     this.setState({
       pickerShowing: true
@@ -49,19 +42,24 @@ class ChooseFolder extends React.Component {
   render() {
     const { pickerShowing } = this.state;
 
-    return this.state.redirect ? <Redirect push to="/deck-builder" /> : (
+    return this.state.redirect ? (
+      <Redirect push to="/deck-builder" />
+    ) : (
       <React.Fragment>
         {pickerShowing ? (
           <Text type="secondary">
-            <Icon type="loading" /> &nbsp;
-            Selecting folder
+            <Icon type="loading" /> &nbsp; Selecting folder
           </Text>
         ) : (
           <Result
             status="warning"
             title="You need to pick a folder to continue."
             extra={
-              <Button type="primary" key="console" onClick={() => this.showPicker()}>
+              <Button
+                type="primary"
+                key="console"
+                onClick={() => this.showPicker()}
+              >
                 Choose Folder
               </Button>
             }
@@ -70,7 +68,6 @@ class ChooseFolder extends React.Component {
       </React.Fragment>
     );
   }
-
 }
 
 export default ChooseFolder;

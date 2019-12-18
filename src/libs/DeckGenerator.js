@@ -1,15 +1,14 @@
 export const generatorStatus = {
-  PRESTART:           "prestart",
-  BACKGROUND:         "background processing",
+  PRESTART: "prestart",
+  BACKGROUND: "background processing",
   ACCESSING_NEW_DECK: "accessing new deck",
-  WAITING:            "waiting",
+  WAITING: "waiting",
   CONFIGURING_SLIDES: "configuring slides",
-  DECK_SELECTED:      "deck selected",
-  FINISHED:           "finished"
-}
+  DECK_SELECTED: "deck selected",
+  FINISHED: "finished"
+};
 
 export default class DeckGenerator {
-
   /**
    * Queue for functions that are waiting for a promise to resolve.
    * @type {Array}
@@ -37,17 +36,16 @@ export default class DeckGenerator {
   status = generatorStatus.PRESTART;
 
   constructor(googleHelper, updateListener, folderId) {
-    this.googleHelper   = googleHelper;
+    this.googleHelper = googleHelper;
     this.updateListener = updateListener || console.log;
-    this.folderId       = folderId
+    this.folderId = folderId;
   }
 
   _queue(f) {
-    // Either run now, or add to array 
-    if(this.ready) {
+    // Either run now, or add to array
+    if (this.ready) {
       f();
-    }
-    else {
+    } else {
       this.queue.push(f);
     }
   }
@@ -61,43 +59,45 @@ export default class DeckGenerator {
     this._updateStatus(generatorStatus.BACKGROUND);
 
     // Set temp filename with timestamp so we can remove it later
-    const tempFilename = "~$deckbuilder-" + (new Date().getTime());
+    const tempFilename = "~$deckbuilder-" + new Date().getTime();
 
     // Set ready to `false` so no other actions will run until the deck is in place
     this.ready = false;
 
     // Copy the master deck into the destination folder
-    this.googleHelper.copyMasterDeck(tempFilename, this.folderId)
-    .then((fileId) => {
-      // Update the file ID
-      this.fileId = fileId;
+    this.googleHelper
+      .copyMasterDeck(tempFilename, this.folderId)
+      .then(fileId => {
+        // Update the file ID
+        this.fileId = fileId;
 
-      this._updateStatus(generatorStatus.ACCESSING_NEW_DECK, {fileId});
+        this._updateStatus(generatorStatus.ACCESSING_NEW_DECK, { fileId });
 
-      // Get the deck for use later...
-      this.googleHelper.getPresentation(fileId)
-      .then(deck => {
-        this.tempDeck = deck;
+        // Get the deck for use later...
+        this.googleHelper.getPresentation(fileId).then(deck => {
+          this.tempDeck = deck;
 
-        // Set waiting state
-        this._updateStatus(generatorStatus.WAITING);
+          // Set waiting state
+          this._updateStatus(generatorStatus.WAITING);
 
-        // Run through the queue and run any functions we need...
-        while (this.queue.length > 0) {
-          // Shift removes from the array too
-          (this.queue.shift())();   
-        }
+          // Run through the queue and run any functions we need...
+          while (this.queue.length > 0) {
+            // Shift removes from the array too
+            this.queue.shift()();
+          }
 
-        // Set ready state
-        this.ready = true;
+          // Set ready state
+          this.ready = true;
+        });
+      })
+      .catch(error => {
+        console.log(error);
       });
-    })
-    .catch(error => { console.log(error); });
   }
 
   generate(values, chosenDecks, deletedDecks, errorCallback) {
     // Track decks via analytics
-    for(const deck of chosenDecks) {
+    for (const deck of chosenDecks) {
       this._updateStatus(generatorStatus.DECK_SELECTED, { deck });
     }
 
@@ -124,15 +124,13 @@ export default class DeckGenerator {
       this.googleHelper.updateFilename(this.fileId, filename);
 
       // Check if we need to delete any slides
-      if(deletedDecks.length > 0) {
+      if (deletedDecks.length > 0) {
         // Delete unnecessary slides
-        this.deleteSlides(this.fileId, slides, deletedDecks)
-        .then(() => { 
+        this.deleteSlides(this.fileId, slides, deletedDecks).then(() => {
           // Call to finish
           this._updateStatus(generatorStatus.FINISHED);
         });
-      }
-      else {
+      } else {
         // No slides need to be deleted, we can just finish
         this._updateStatus(generatorStatus.FINISHED);
       }
@@ -156,13 +154,13 @@ export default class DeckGenerator {
    * @param  {object} values        Values from the deckbuilder form that was
    *                                submitted
    * @param  {array}  originalDecks The original decks from our config file
-   * @return {Promise}              Gets returned when the updates are made      
+   * @return {Promise}              Gets returned when the updates are made
    */
   updateTitleAndAgendaSlides(fileId, slides, chosenDecks, values) {
     // Generate the agenda text
-    let agendaInt   = 1;
-    let agendaText  = "";
-    for(const deck of chosenDecks) {
+    let agendaInt = 1;
+    let agendaText = "";
+    for (const deck of chosenDecks) {
       agendaText += agendaInt + ". " + deck.agendaTitle + "\n";
       agendaInt++;
     }
@@ -213,11 +211,10 @@ export default class DeckGenerator {
   deleteSlides(fileId, slides, deletedDecks) {
     return new Promise((resolve, reject) => {
       // Get the list of deletions - this can go straight into the request
-      const deletions = this.generateDeletions(deletedDecks, slides)
+      const deletions = this.generateDeletions(deletedDecks, slides);
 
       // Delete the decks
-      this.googleHelper.deleteSlides(fileId, deletions)
-      .then(() => resolve());
+      this.googleHelper.deleteSlides(fileId, deletions).then(() => resolve());
     });
   }
 
@@ -231,19 +228,19 @@ export default class DeckGenerator {
    *   from the Google API (this will have all of the slide ids in it for us
    *   to record)
    * @return {array}               Array of objects which will form the
-   *   request to batch delete slides from the presentation 
+   *   request to batch delete slides from the presentation
    */
   generateDeletions(deletedDecks, slides) {
     // Create variable to store list of deletions
     let deletions = [];
 
     // Loop through all the original decks to see which ones we need to delete.
-    for(const deckToDelete of deletedDecks) {
-      // Start at the current deck's offset in the master deck 
+    for (const deckToDelete of deletedDecks) {
+      // Start at the current deck's offset in the master deck
       let currOffset = deckToDelete.offset;
 
       // Loop through each subsequent slide
-      for(var j = 0; j < deckToDelete.slides; j++) {
+      for (var j = 0; j < deckToDelete.slides; j++) {
         // Get the slide
         let slide = slides[currOffset];
 
@@ -259,5 +256,4 @@ export default class DeckGenerator {
     }
     return deletions;
   }
-
 }

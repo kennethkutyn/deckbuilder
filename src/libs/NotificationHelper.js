@@ -1,5 +1,4 @@
 export default class NotificationHelper {
-
   constructor() {
     this.permission = Notification.permission;
   }
@@ -11,14 +10,14 @@ export default class NotificationHelper {
   blocked() {
     return this.permission !== "granted" && this.permission !== "default";
   }
-  
+
   request() {
     return new Promise((resolve, reject) => {
       let permission = Notification.permission;
 
-      if(permission === "default") {
+      if (permission === "default") {
         // Ask the customer to allow notifications
-        Notification.requestPermission((permission) => {
+        Notification.requestPermission(permission => {
           this.permission = permission;
           resolve(this.granted());
         });
@@ -27,16 +26,15 @@ export default class NotificationHelper {
   }
 
   notify(title, body, iconURL, openURL) {
-    if(this.granted()) {
+    if (this.granted()) {
       // Send the notification
       let notif = new Notification(title, {
-        "body": body,
-        "icon": iconURL
+        body: body,
+        icon: iconURL
       });
       notif.onclick = function() {
         window.open(openURL);
-      }
+      };
     }
   }
-
 }
