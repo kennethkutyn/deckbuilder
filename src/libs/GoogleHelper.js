@@ -7,12 +7,15 @@ export default class GoogleHelper {
    */
   constructor() {
     // Configure some of the variables for the gapis sdk
+    this.seMasterDeckId = '1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4';
+    this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
+
     this.scope =
       "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
     this.discoveryDocs = [
       "https://slides.googleapis.com/$discovery/rest?version=v1"
     ];
-    this.masterDeckId = "1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4";
+    //this.masterDeckId = "1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4";
 
     // Hidden vars for use in getter/setter functions
     this.currentUser_ = null;
@@ -162,11 +165,20 @@ export default class GoogleHelper {
    * @param  {string} destinationFolder Folder id for where the new master deck should be copied to
    * @return {Promise}                  Promise
    */
-  copyMasterDeck(filename, destinationFolder, tries = 0) {
+  copyMasterDeck(filename, destinationFolder, team, tries = 0) {
+    let masterId = null;
+    if (team === "se"){
+      masterId = this.seMasterDeckId;
+    } else if(team === "pssc"){
+      masterId = this.psscMasterDeckId;
+    } else{
+      masterId = this.seMasterDeckId;
+    }
+
     return this.loadDriveClient().then(() => {
       return window.gapi.client.drive.files
         .copy({
-          fileId: this.masterDeckId,
+          fileId: masterId,
           resource: {
             name: filename,
             parents: [destinationFolder]
