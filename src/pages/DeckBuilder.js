@@ -27,7 +27,6 @@ class DeckBuilder extends React.Component {
    */
   constructor(props) {
     super(props);
-
     if(props.team == "se"){
       deckStructure = seMasterDeckStructure;
     } else if(props.team == "pssc"){
