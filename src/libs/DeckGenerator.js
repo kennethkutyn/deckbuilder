@@ -35,10 +35,11 @@ export default class DeckGenerator {
 
   status = generatorStatus.PRESTART;
 
-  constructor(googleHelper, updateListener, folderId) {
+  constructor(googleHelper, updateListener, folderId, team) {
     this.googleHelper = googleHelper;
     this.updateListener = updateListener || console.log;
     this.folderId = folderId;
+    this.team = team;
   }
 
   _queue(f) {
@@ -55,7 +56,7 @@ export default class DeckGenerator {
     this.updateListener(status, info);
   }
 
-  start() {
+  start(team) {
     this._updateStatus(generatorStatus.BACKGROUND);
 
     // Set temp filename with timestamp so we can remove it later
@@ -66,7 +67,7 @@ export default class DeckGenerator {
 
     // Copy the master deck into the destination folder
     this.googleHelper
-      .copyMasterDeck(tempFilename, this.folderId)
+      .copyMasterDeck(tempFilename, this.folderId, team)
       .then(fileId => {
         // Update the file ID
         this.fileId = fileId;
@@ -95,7 +96,7 @@ export default class DeckGenerator {
       });
   }
 
-  generate(values, chosenDecks, deletedDecks, errorCallback) {
+  generate(values, chosenDecks, deletedDecks, team, errorCallback) {
     // Track decks via analytics
     for (const deck of chosenDecks) {
       this._updateStatus(generatorStatus.DECK_SELECTED, { deck });
