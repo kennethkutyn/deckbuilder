@@ -82,7 +82,6 @@ class App extends React.Component {
     // Set up the current state of the component for the rendering below
     // This is just to make the following code more manageable
     const { loggedIn, googleUsername, folder, team } = this.state;
-
     const folderName = folder !== null ? folder.name : "";
 
     return (
