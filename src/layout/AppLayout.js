@@ -39,7 +39,7 @@ class AppLayout extends React.Component {
         <Content style={{ padding: "50px" }}>
           <div style={{ background: "#fff", padding: 24 }}>
             <Title level={2} style={{ marginBottom: 25 }}>
-              Optimizely SE Deck Builder
+              Optimizely Deck Builder
             </Title>
 
             <Steps
