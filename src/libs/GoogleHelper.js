@@ -9,6 +9,7 @@ export default class GoogleHelper {
     // Configure some of the variables for the gapis sdk
     this.seMasterDeckId = '1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4';
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
+    this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
 
     this.scope =
       "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
@@ -171,7 +172,9 @@ export default class GoogleHelper {
       masterId = this.seMasterDeckId;
     } else if(team === "pssc"){
       masterId = this.psscMasterDeckId;
-    } else{
+    } else if(team === "csm"){
+      masterId = this.csmMasterDeckId;
+    } else {
       masterId = this.seMasterDeckId;
     }
 

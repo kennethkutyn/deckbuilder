@@ -13,9 +13,10 @@ statusMessages[generatorStatus.ACCESSING_NEW_DECK] = "Reading new deck";
 statusMessages[generatorStatus.CONFIGURING_SLIDES] =
   "Configuring slides (this may take some time)";
 
-  let deckStructure = "https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0";
-  const seMasterDeckStructure = 'https://api.sheety.co/6f260fb0-04d8-4732-b8f2-0dc87c295fc0';
-  const psscMasterDeckStructure = 'https://api.sheety.co/cc2429e6-96ed-4244-890b-e2302b0e3996';
+  let deckStructure = "https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/se";
+  const seMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/se';
+  const psscMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/pssc';
+  const csmMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/csm';
 
 class DeckBuilder extends React.Component {
   deckGenerator = null;
@@ -31,6 +32,8 @@ class DeckBuilder extends React.Component {
       deckStructure = seMasterDeckStructure;
     } else if(props.team == "pssc"){
       deckStructure = psscMasterDeckStructure;
+    } else if (props.team == "csm"){
+      deckStructure = csmMasterDeckStructure;
     } else {
       deckStructure = seMasterDeckStructure;
     }
@@ -61,7 +64,14 @@ class DeckBuilder extends React.Component {
     fetch(deckStructure).then(response => {
       response.json().then(data => {
         // Get the decks and prepare them
-        let decks = this.prepareDecks(data);
+        
+        let decks = [];
+        let team = "";
+        for (team in data) {
+          decks = this.prepareDecks(data[team]);
+        } 
+
+
 
         // Update the state of the form with the new decks
         this.setState({ decks });
@@ -162,12 +172,12 @@ class DeckBuilder extends React.Component {
                 })(<Input />)}
               </Form.Item>
 
-              <Form.Item label="SE Name">
+              <Form.Item label="Your Name">
                 {getFieldDecorator("se_name", {
                   rules: [
                     {
                       required: true,
-                      message: "Please input an SE name!",
+                      message: "Please input your name!",
                       whitespace: true
                     }
                   ],
