@@ -106,7 +106,8 @@ export default class GoogleHelper {
    */
   getUsername() {
     if (this.currentUser_.isSignedIn()) {
-      return this.currentUser_.w3.ig;
+      return this.currentUser_.getName;
+      //return this.currentUser_.w3.ig;
     }
     // TODO: replace with thrown error
     return null;
