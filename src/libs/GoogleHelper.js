@@ -193,7 +193,7 @@ export default class GoogleHelper {
           console.log("Error with copying master deck: ", err);
           if (tries < 3) {
             console.log("Retrying");
-            return this.copyMasterDeck(filename, destinationFolder, tries + 1);
+            return this.copyMasterDeck(filename, destinationFolder, team, tries + 1);
           } else {
             console.log("Giving up");
             throw err;
