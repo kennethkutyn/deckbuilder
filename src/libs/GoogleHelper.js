@@ -11,6 +11,7 @@ export default class GoogleHelper {
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
     this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
 
+    this.pocPlanId = '1Mov-LfNrEb1ftxPP4YGjUBxlAUMrLBXbFZ9vT3bYA9U'; 
     this.scope =
       "https://www.googleapis.com/auth/presentations https://www.googleapis.com/auth/drive";
     this.discoveryDocs = [
@@ -194,6 +195,33 @@ export default class GoogleHelper {
           if (tries < 3) {
             console.log("Retrying");
             return this.copyMasterDeck(filename, destinationFolder, team, tries + 1);
+          } else {
+            console.log("Giving up");
+            alert('Sorry, Google Drive was unable to generate the new deck. Please try again.');
+            throw err;
+          }
+        });
+    });
+  }
+
+  copyPoCPlan(fileName, destinationFolder, tries = 0) {
+
+
+    return this.loadDriveClient().then(() => {
+      return window.gapi.client.drive.files
+        .copy({
+          fileId: this.pocPlanId,
+          resource: {
+            name: fileName,
+            parents: [destinationFolder]
+          }
+        })
+        .then(response => response.result.id)
+        .catch(err => {
+          console.log("Error with copying poc plan: ", err);
+          if (tries < 3) {
+            console.log("Retrying");
+            return this.copyPoCPlan(fileName, destinationFolder, tries + 1);
           } else {
             console.log("Giving up");
             throw err;

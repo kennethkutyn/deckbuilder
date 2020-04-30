@@ -52,7 +52,8 @@ class DeckBuilder extends React.Component {
       generatingMessage: null, // The message that should be shown when the deck is generating
       redirect: false, // Redirect to the last stage
       errorMessage: null,
-      shouldNotify: this.notificationHelper.granted() // Whether the checkbox for "notify" should be checked or not
+      shouldNotify: this.notificationHelper.granted(), // Whether the checkbox for "notify" should be checked or not
+      generatePoC: false
     };
 
     // Create an analytics helper
@@ -242,6 +243,20 @@ class DeckBuilder extends React.Component {
                   )}
                 </Form.Item>
               )}
+
+              
+              <Form.Item label="PoC">
+                  {getFieldDecorator("PoC", {
+                    valuePropName: "checked",
+                    initialValue: this.state.shouldPoC
+                  })(
+                    <Checkbox onChange={e => this.pocChange(e)}>
+                      Also generate a PoC Planner Template
+                    </Checkbox>
+                  )}
+                </Form.Item>
+              
+
             </Col>
           </Row>
 
@@ -303,9 +318,22 @@ class DeckBuilder extends React.Component {
     }
   }
 
+  pocChange(e) {
+    
+    let checked = e.target.checked;
+    this.togglePoC(checked);
+    
+  }
+
   toggleNotifications(onOff) {
     this.setState({
       shouldNotify: onOff
+    });
+  }
+
+  togglePoC(onOff) {
+    this.setState({
+      generatePoC: onOff
     });
   }
 
@@ -380,11 +408,12 @@ class DeckBuilder extends React.Component {
         values.logo = this.state.logo;
 
         // Start the deck generator
-        this.deckGenerator.generate(values, chosenDecks, deletedDecks, this.props.team, err => {
+        this.deckGenerator.generate(values, chosenDecks, deletedDecks, this.props.team, this.state.generatePoC, err => {
           this.setState({
             errorMessage: JSON.stringify(err, null, 1)
           });
         });
+
 
         // Set the state to loading so we hide the form
         this.setState({

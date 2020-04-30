@@ -1,3 +1,5 @@
+import DeckBuilder from "../pages/DeckBuilder";
+
 export const generatorStatus = {
   PRESTART: "prestart",
   BACKGROUND: "background processing",
@@ -8,7 +10,7 @@ export const generatorStatus = {
   FINISHED: "finished"
 };
 
-export default class DeckGenerator {
+export default class pocPlanCopy {
   /**
    * Queue for functions that are waiting for a promise to resolve.
    * @type {Array}
@@ -91,12 +93,14 @@ export default class DeckGenerator {
           this.ready = true;
         });
       })
+      
+
       .catch(error => {
         console.log(error);
       });
   }
 
-  generate(values, chosenDecks, deletedDecks, team, errorCallback) {
+  generate(values, chosenDecks, deletedDecks, team, poc, errorCallback) {
     // Track decks via analytics
     for (const deck of chosenDecks) {
       this._updateStatus(generatorStatus.DECK_SELECTED, { deck });
@@ -129,10 +133,19 @@ export default class DeckGenerator {
         // Delete unnecessary slides
         this.deleteSlides(this.fileId, slides, deletedDecks).then(() => {
           // Call to finish
-          this._updateStatus(generatorStatus.FINISHED);
+          
+          if (!poc){
+            this._updateStatus(generatorStatus.FINISHED);
+          }
         });
       } else {
         // No slides need to be deleted, we can just finish
+        if (!poc){
+          this._updateStatus(generatorStatus.FINISHED);
+        }
+      }
+      if (poc){
+        this.googleHelper.copyPoCPlan(customerName + '| Tech Validation Plan', this.folderId);
         this._updateStatus(generatorStatus.FINISHED);
       }
     });
