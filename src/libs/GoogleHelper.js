@@ -318,6 +318,43 @@ export default class GoogleHelper {
     });
   }
 
+  addLogoToDataSlides(deckId, logoURL, slide) {
+    let slideId = slide.objectId;
+
+    var requests = [];
+    var imageId = "customerLogo";
+    var emu4M = {
+      magnitude: 4000000,
+      unit: "EMU"
+    };
+    requests.push({
+      createImage: {
+        objectId: imageId,
+        url: logoURL,
+        elementProperties: {
+          pageObjectId: slideId,
+          size: {
+            height: emu4M,
+            width: emu4M
+          },
+          transform: {
+            scaleX: 0.2,
+            scaleY: 0.2,
+            translateX: 8000000,
+            translateY: 100000,
+            unit: "EMU"
+          }
+        }
+      }
+    });
+
+    return new Promise((resolve, reject) => {
+      this.batchUpdateDeck(deckId, requests).then(() => {
+        resolve();
+      });
+    });
+  }
+
   /**
    * Update the slides by replacing text
    * @param  {string} deckId  The ID for the deck to update the text in

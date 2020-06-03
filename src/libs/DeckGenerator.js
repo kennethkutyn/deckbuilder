@@ -125,6 +125,11 @@ export default class pocPlanCopy {
       // Add the customer logo
       this.addCustomerLogoToDeck(this.fileId, values.logo, slides);
 
+      //update data slides with logo
+      if (team = "data"){
+        this.addCustomerLogoToDataSlides(this.fileId, values.logo, slides);
+      }
+
       // Update the filename
       this.googleHelper.updateFilename(this.fileId, filename);
 
@@ -213,6 +218,14 @@ export default class pocPlanCopy {
 
     // Add it
     this.googleHelper.addLogoToSlide(deckId, logoURL, slide);
+  }
+
+  addCustomerLogoToDataSlides(deckId, logoURL, slides) {
+    // Find the correct slide
+    let slide = slides[2];
+
+    // Add it
+    this.googleHelper.addLogoToDataSlides(deckId, logoURL, slide);
   }
 
   /**
