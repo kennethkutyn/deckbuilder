@@ -318,21 +318,23 @@ export default class GoogleHelper {
     });
   }
 
-  addLogoToDataSlides(deckId, logoURL, slide) {
-    let slideId = slide.objectId;
-
+  addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide) {
+    let slideId1 = titleSlide.objectId;
+    let slideId2 = diagramSlide.objectId;
     var requests = [];
-    var imageId = "customerLogo";
+    var imageId = "customerLogo2";
     var emu4M = {
       magnitude: 4000000,
       unit: "EMU"
     };
+
+    //add a request for placing the customer logo on the title slide
     requests.push({
       createImage: {
         objectId: imageId,
         url: logoURL,
         elementProperties: {
-          pageObjectId: slideId,
+          pageObjectId: slideId1,
           size: {
             height: emu4M,
             width: emu4M
@@ -347,6 +349,50 @@ export default class GoogleHelper {
         }
       }
     });
+
+    //add a request to place each customer logo on the diagram slide
+    requests.push({
+      createImage: {
+        objectId: "logo3",
+        url: logoURL,
+        elementProperties: {
+          pageObjectId: slideId2,
+          size: {
+            height: emu4M,
+            width: emu4M
+          },
+          transform: {
+            scaleX: 0.05,
+            scaleY: 0.05,
+            translateX: 5600000,
+            translateY: 3460000,
+            unit: "EMU"
+          }
+        }
+      }
+    });
+
+    requests.push({
+      createImage: {
+        objectId: "logo4",
+        url: logoURL,
+        elementProperties: {
+          pageObjectId: slideId2,
+          size: {
+            height: emu4M,
+            width: emu4M
+          },
+          transform: {
+            scaleX: 0.05,
+            scaleY: 0.05,
+            translateX: 6050000,
+            translateY: 4450000,
+            unit: "EMU"
+          }
+        }
+      }
+    });
+
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {

@@ -123,12 +123,9 @@ export default class pocPlanCopy {
       this.updateTitleAndAgendaSlides(this.fileId, slides, chosenDecks, values);
 
       // Add the customer logo
-      this.addCustomerLogoToDeck(this.fileId, values.logo, slides);
+      this.addCustomerLogoToDeck(this.fileId, values.logo, team, slides);
 
-      //update data slides with logo
-      if (team = "data"){
-        this.addCustomerLogoToDataSlides(this.fileId, values.logo, slides);
-      }
+
 
       // Update the filename
       this.googleHelper.updateFilename(this.fileId, filename);
@@ -212,20 +209,17 @@ export default class pocPlanCopy {
     this.googleHelper.updateSlidesByReplacingText(fileId, replacements);
   }
 
-  addCustomerLogoToDeck(deckId, logoURL, slides) {
+  addCustomerLogoToDeck(deckId, logoURL, team, slides) {
     // Find the correct slide
-    let slide = slides[0];
-
+    let titleSlide = slides[0];
     // Add it
-    this.googleHelper.addLogoToSlide(deckId, logoURL, slide);
-  }
-
-  addCustomerLogoToDataSlides(deckId, logoURL, slides) {
-    // Find the correct slide
-    let slide = slides[2];
-
-    // Add it
-    this.googleHelper.addLogoToDataSlides(deckId, logoURL, slide);
+    if(team == "data"){
+      let diagramSlide = slides[2]; // the slide with the diagrams is the 3rd slide in the deck
+      this.googleHelper.addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide);
+    }else{
+      this.googleHelper.addLogoToSlide(deckId, logoURL, titleSlide);
+    }
+    
   }
 
   /**
