@@ -10,6 +10,7 @@ export default class GoogleHelper {
     this.seMasterDeckId = '1zGxQQKJVNf5ygyRNeli_K4y6AzLOZ4mkX5wQVH0NmU4';
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
     this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
+    this.dataMasterDeckId = '1NJWB9jfmJm89wO33gAfI_7bC_fJ7vIcFZW-1IgW8Z1Y';
 
     this.pocPlanId = '1Mov-LfNrEb1ftxPP4YGjUBxlAUMrLBXbFZ9vT3bYA9U'; 
     this.scope =
@@ -176,6 +177,8 @@ export default class GoogleHelper {
       masterId = this.psscMasterDeckId;
     } else if(team === "csm"){
       masterId = this.csmMasterDeckId;
+    } else if(team === "data"){
+      masterId = this.dataMasterDeckId;
     } else {
       masterId = this.seMasterDeckId;
     }

@@ -17,6 +17,7 @@ statusMessages[generatorStatus.CONFIGURING_SLIDES] =
   const seMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/se';
   const psscMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/pssc';
   const csmMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/csm';
+  const dataMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/data';
 
 class DeckBuilder extends React.Component {
   deckGenerator = null;
@@ -32,6 +33,8 @@ class DeckBuilder extends React.Component {
       deckStructure = seMasterDeckStructure;
     } else if(props.team == "pssc"){
       deckStructure = psscMasterDeckStructure;
+    } else if(props.team == "data"){
+      deckStructure = dataMasterDeckStructure;
     } else if (props.team == "csm"){
       deckStructure = csmMasterDeckStructure;
     } else {
