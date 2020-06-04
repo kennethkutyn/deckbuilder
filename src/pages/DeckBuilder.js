@@ -164,11 +164,11 @@ class DeckBuilder extends React.Component {
                 </Col>
               </Row>
 
-              <Form.Item label="AE Name">
+              <Form.Item label="AE Name (Optional)">
                 {getFieldDecorator("ae_name", {
                   rules: [
                     {
-                      required: true,
+                      required: false,
                       message: "Please input an AE name!",
                       whitespace: true
                     }
