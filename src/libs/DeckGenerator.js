@@ -1,4 +1,5 @@
 import DeckBuilder from "../pages/DeckBuilder";
+import AnalyticsHelper from "./AnalyticsHelper";
 
 export const generatorStatus = {
   PRESTART: "prestart",
@@ -59,6 +60,9 @@ export default class pocPlanCopy {
   }
 
   start(team) {
+
+    
+
     this._updateStatus(generatorStatus.BACKGROUND);
 
     // Set temp filename with timestamp so we can remove it later
@@ -101,9 +105,15 @@ export default class pocPlanCopy {
   }
 
   generate(values, chosenDecks, deletedDecks, team, poc, errorCallback) {
+
+    // Create an analytics helper
+    this.analyticsHelper = new AnalyticsHelper(true);
+
     // Track decks via analytics
+
     for (const deck of chosenDecks) {
       this._updateStatus(generatorStatus.DECK_SELECTED, { deck });
+      this.analyticsHelper.track(deck);
     }
 
     // Get relevant variables from the values object

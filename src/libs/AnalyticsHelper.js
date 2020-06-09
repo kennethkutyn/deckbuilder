@@ -3,6 +3,9 @@ import ReactGA from "react-ga";
 ReactGA.initialize("UA-146656690-1");
 export default class AnalyticsHelper {
   track(deck) {
+
+    console.log('sending events for ' + deck.title);
+
     window["optimizely"] = window["optimizely"] || [];
     window["optimizely"].push({
       type: "event",
@@ -17,10 +20,7 @@ export default class AnalyticsHelper {
 
     window.FS.event('Deck Included', {
       deck: deck.title
-    }
-    )
-
-
+    });
   }
 
   trackState(stateName) {
