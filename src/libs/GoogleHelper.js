@@ -107,11 +107,11 @@ export default class GoogleHelper {
    * @return {string} The username if they are logged in, null if not
    */
   getUsername() {
+    
     if (this.currentUser_.isSignedIn()) {
-      return this.currentUser_.getName;
-      console.log(this.currentUser_.ge)
-      //return this.currentUser_.w3.ig;
-    }
+      var profile = this.currentUser_.getBasicProfile();
+
+      return profile.getName();    }
     // TODO: replace with thrown error
     return null;
   }
