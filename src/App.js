@@ -155,7 +155,10 @@ class App extends React.Component {
       loggedIn: true
     });
 
-    window.FS.identify(this.state.googleUsername);
+    window.FS.identify(this.googleHelper.getEmail(), {
+      displayName: this.googleHelper.getUsername(),
+      email: this.googleHelper.getEmail()  
+    });
 
     // Send a visual message to tell user they're logged in
     message.success("Logged in as " + this.state.googleUsername);

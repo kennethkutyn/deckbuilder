@@ -116,6 +116,16 @@ export default class GoogleHelper {
     return null;
   }
 
+  getEmail() {
+    
+    if (this.currentUser_.isSignedIn()) {
+      var profile = this.currentUser_.getBasicProfile();
+
+      return profile.getEmail();    }
+    // TODO: replace with thrown error
+    return null;
+  }
+
   /**
    * Generates a picker view and shows it on screen to the user
    * @param  {function} selectedFolderCallback Callback for when a user selects a folder in the picker
