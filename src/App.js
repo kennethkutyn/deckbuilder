@@ -157,7 +157,8 @@ class App extends React.Component {
 
     window.FS.identify(this.googleHelper.getEmail(), {
       displayName: this.googleHelper.getUsername(),
-      email: this.googleHelper.getEmail()  
+      email: this.googleHelper.getEmail(),
+      userType: this.state.team
     });
 
     // Send a visual message to tell user they're logged in
