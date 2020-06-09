@@ -109,6 +109,7 @@ export default class GoogleHelper {
   getUsername() {
     if (this.currentUser_.isSignedIn()) {
       return this.currentUser_.getName;
+      console.log(this.currentUser_.ge)
       //return this.currentUser_.w3.ig;
     }
     // TODO: replace with thrown error
@@ -320,7 +321,7 @@ export default class GoogleHelper {
 
   addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide) {
     let slideId1 = titleSlide.objectId;
-    let slideId2 = diagramSlide.objectId;
+    let slideId2 = "g8083697ea8_0_58";//diagramSlide.objectId;
     var requests = [];
     var imageId = "customerLogo2";
     var emu4M = {

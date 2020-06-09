@@ -147,7 +147,7 @@ export default class pocPlanCopy {
         }
       }
       if (poc){
-        this.googleHelper.copyPoCPlan(customerName + '| Tech Validation Plan', this.folderId);
+        this.googleHelper.copyPoCPlan(customerName + ' | Tech Validation Plan', this.folderId);
         this._updateStatus(generatorStatus.FINISHED);
       }
     });
@@ -214,7 +214,7 @@ export default class pocPlanCopy {
     let titleSlide = slides[0];
     // Add it
     if(team == "data"){
-      let diagramSlide = slides[2]; // the slide with the diagrams is the 3rd slide in the deck
+      let diagramSlide = slides[2]; // this is not used, the ID of the slide with diagrams is hard-coded inside google Helper
       this.googleHelper.addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide);
     }else{
       this.googleHelper.addLogoToSlide(deckId, logoURL, titleSlide);
