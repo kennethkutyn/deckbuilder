@@ -126,7 +126,6 @@ export default class pocPlanCopy {
       this.addCustomerLogoToDeck(this.fileId, values.logo, team, slides);
 
 
-
       // Update the filename
       this.googleHelper.updateFilename(this.fileId, filename);
 
@@ -221,6 +220,8 @@ export default class pocPlanCopy {
     }
     
   }
+
+
 
   /**
    * Delete the slides that weren't chosen by the user

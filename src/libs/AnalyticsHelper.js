@@ -14,6 +14,13 @@ export default class AnalyticsHelper {
       action: "included",
       label: deck.title
     });
+
+    window.FS.event('Deck Included', {
+      deck: deck.title
+    }
+    )
+
+
   }
 
   trackState(stateName) {
