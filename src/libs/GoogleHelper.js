@@ -301,6 +301,7 @@ export default class GoogleHelper {
       magnitude: 4000000,
       unit: "EMU"
     };
+    
     requests.push({
       createImage: {
         objectId: imageId,
@@ -321,6 +322,7 @@ export default class GoogleHelper {
         }
       }
     });
+    
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {
@@ -339,7 +341,20 @@ export default class GoogleHelper {
       unit: "EMU"
     };
 
-    //add a request for placing the customer logo on the title slide
+    console.log(requests);
+    //add a request to replace text with logos
+    requests.push({
+      replaceAllShapesWithImage: {
+        imageUrl: logoURL,
+        containsText: {
+            text: "{{LOGO}}"
+        }
+    
+    }});
+    
+    console.log(requests);
+
+    /*add a request for placing the customer logo on the title slide
     requests.push({
       createImage: {
         objectId: imageId,
@@ -360,8 +375,9 @@ export default class GoogleHelper {
         }
       }
     });
+    */
 
-    //add a request to place each customer logo on the diagram slide
+    /*add a request to place each customer logo on the diagram slide
     requests.push({
       createImage: {
         objectId: "logo3",
@@ -403,7 +419,7 @@ export default class GoogleHelper {
         }
       }
     });
-
+*/
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {
