@@ -11,6 +11,7 @@ export default class GoogleHelper {
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
     this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
     this.dataMasterDeckId = '1NJWB9jfmJm89wO33gAfI_7bC_fJ7vIcFZW-1IgW8Z1Y';
+    this.ab2MasterDeckId = '1jfuN0HEuinbnwU0QVJjH1YDh-dv36DfZ69AC8kRPGxo';
 
     this.pocPlanId = '1Mov-LfNrEb1ftxPP4YGjUBxlAUMrLBXbFZ9vT3bYA9U'; 
     this.scope =
@@ -190,6 +191,8 @@ export default class GoogleHelper {
       masterId = this.csmMasterDeckId;
     } else if(team === "data"){
       masterId = this.dataMasterDeckId;
+    } else if(team === "ab2"){
+      masterId = this.ab2MasterDeckId;
     } else {
       masterId = this.seMasterDeckId;
     }
@@ -332,8 +335,8 @@ export default class GoogleHelper {
   }
 
   addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide) {
-    let slideId1 = titleSlide.objectId;
-    let slideId2 = "g8083697ea8_0_58";//diagramSlide.objectId;
+    //let slideId1 = titleSlide.objectId;
+    //let slideId2 = "g8083697ea8_0_58";//diagramSlide.objectId;
     var requests = [];
     var imageId = "customerLogo2";
     var emu4M = {
@@ -341,7 +344,6 @@ export default class GoogleHelper {
       unit: "EMU"
     };
 
-    console.log(requests);
     //add a request to replace text with logos
     requests.push({
       replaceAllShapesWithImage: {
@@ -352,7 +354,6 @@ export default class GoogleHelper {
     
     }});
     
-    console.log(requests);
 
     /*add a request for placing the customer logo on the title slide
     requests.push({
