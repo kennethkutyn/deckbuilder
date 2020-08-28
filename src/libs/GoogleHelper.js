@@ -183,6 +183,7 @@ export default class GoogleHelper {
    */
   copyMasterDeck(filename, destinationFolder, team, tries = 0) {
     let masterId = null;
+    console.log(team);
     if (team === "se"){
       masterId = this.seMasterDeckId;
     } else if(team === "pssc"){
