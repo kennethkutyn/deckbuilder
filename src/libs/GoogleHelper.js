@@ -11,7 +11,7 @@ export default class GoogleHelper {
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
     this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
     this.dataMasterDeckId = '1NJWB9jfmJm89wO33gAfI_7bC_fJ7vIcFZW-1IgW8Z1Y';
-    this.ab2MasterDeckId = '1jfuN0HEuinbnwU0QVJjH1YDh-dv36DfZ69AC8kRPGxo';
+    this.ab2MasterDeckId = '147s2W65Jzf7FijxOys-wr1oOfqmJWCayWq4g8_JhLto';
 
     this.pocPlanId = '1Mov-LfNrEb1ftxPP4YGjUBxlAUMrLBXbFZ9vT3bYA9U'; 
     this.scope =
