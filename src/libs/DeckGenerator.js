@@ -222,8 +222,8 @@ export default class pocPlanCopy {
     // Find the correct slide
     let titleSlide = slides[0];
     // Add it
-    if(team == "data"){
-      let diagramSlide = slides[2]; // this is not used, the ID of the slide with diagrams is hard-coded inside google Helper
+    if(team == "data" || team == "ab2"){
+      let diagramSlide = slides[2]; // this is not used, the logos replace a shape that already exists in teh google sheets deck
       this.googleHelper.addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide);
     }else{
       this.googleHelper.addLogoToSlide(deckId, logoURL, titleSlide);

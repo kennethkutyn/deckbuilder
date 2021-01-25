@@ -18,6 +18,7 @@ statusMessages[generatorStatus.CONFIGURING_SLIDES] =
   const psscMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/pssc';
   const csmMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/csm';
   const dataMasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/data';
+  const ab2MasterDeckStructure = 'https://v2-api.sheety.co/44196fd1597f3bc59741a5811a1ba212/csmDeckbuilder/ab'
 
 class DeckBuilder extends React.Component {
   deckGenerator = null;
@@ -37,6 +38,8 @@ class DeckBuilder extends React.Component {
       deckStructure = dataMasterDeckStructure;
     } else if (props.team == "csm"){
       deckStructure = csmMasterDeckStructure;
+    } else if (props.team == "ab2"){
+      deckStructure = ab2MasterDeckStructure;
     } else {
       deckStructure = seMasterDeckStructure;
     }
@@ -75,10 +78,28 @@ class DeckBuilder extends React.Component {
           decks = this.prepareDecks(data[team]);
         } 
 
-
-
         // Update the state of the form with the new decks
         this.setState({ decks });
+
+        let deck;
+        const defaultDecks = [];
+
+        console.log(decks);
+
+        for (deck in decks){
+          if (decks[deck].isDefault == true){
+            defaultDecks.push(parseInt(decks[deck].order));
+          }
+        }
+
+        console.log(defaultDecks);
+
+        //let checkedList = [1, 2, 4];
+
+        this.setState({
+          checkedList: defaultDecks
+        });
+
       });
     });
 
@@ -213,7 +234,8 @@ class DeckBuilder extends React.Component {
                       message: "Please choose at least one slide template",
                       whitespace: true
                     }
-                  ]
+                  ],
+                  initialValue: this.state.checkedList
                 })(
                   <Checkbox.Group
                     style={{ width: "100%" }}
@@ -224,7 +246,7 @@ class DeckBuilder extends React.Component {
                         <Row key={index}>
                           <Col span={24}>
                             <Checkbox value={value.order}>
-                              {value.title} ({value.slides} slides)
+                      {value.title} ({value.slides} slides)
                             </Checkbox>
                           </Col>
                         </Row>
@@ -304,6 +326,7 @@ class DeckBuilder extends React.Component {
       return;
     }
 
+
     let checked = e.target.checked;
 
     // Check if the user wants notifications but doesn't have them enabled
@@ -322,7 +345,7 @@ class DeckBuilder extends React.Component {
   }
 
   pocChange(e) {
-    
+    console.log(e);
     let checked = e.target.checked;
     this.togglePoC(checked);
     
@@ -347,6 +370,7 @@ class DeckBuilder extends React.Component {
    */
   onChange(checkedList) {
     // Set the state of the component to reflect the checkboxes that have been ticked
+    console.log(checkedList);
     this.setState({
       checkedList,
       indeterminate:
@@ -388,7 +412,6 @@ class DeckBuilder extends React.Component {
   handleSubmit(e) {
     // Stop the form from actually submitting
     e.preventDefault();
-
     // Validate the form (this returns either an error or the values from the form)
     this.props.form.validateFields((err, values) => {
       // Check that there's no error (the form will handle itself if there's an error)

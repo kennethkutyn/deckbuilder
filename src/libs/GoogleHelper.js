@@ -11,6 +11,7 @@ export default class GoogleHelper {
     this.psscMasterDeckId = '15GqL5AjUsYrQSIt50jYxu4kdDZXYkGtzT686OBolOeg';
     this.csmMasterDeckId = '1CdUUw03_QeDu8arq_tTDxJpJRTwSBT1YRaEzUnbB9Qs';
     this.dataMasterDeckId = '1NJWB9jfmJm89wO33gAfI_7bC_fJ7vIcFZW-1IgW8Z1Y';
+    this.ab2MasterDeckId = '147s2W65Jzf7FijxOys-wr1oOfqmJWCayWq4g8_JhLto';
 
     this.pocPlanId = '1Mov-LfNrEb1ftxPP4YGjUBxlAUMrLBXbFZ9vT3bYA9U'; 
     this.scope =
@@ -182,6 +183,7 @@ export default class GoogleHelper {
    */
   copyMasterDeck(filename, destinationFolder, team, tries = 0) {
     let masterId = null;
+    console.log(team);
     if (team === "se"){
       masterId = this.seMasterDeckId;
     } else if(team === "pssc"){
@@ -190,6 +192,8 @@ export default class GoogleHelper {
       masterId = this.csmMasterDeckId;
     } else if(team === "data"){
       masterId = this.dataMasterDeckId;
+    } else if(team === "ab2"){
+      masterId = this.ab2MasterDeckId;
     } else {
       masterId = this.seMasterDeckId;
     }
@@ -301,6 +305,7 @@ export default class GoogleHelper {
       magnitude: 4000000,
       unit: "EMU"
     };
+    
     requests.push({
       createImage: {
         objectId: imageId,
@@ -321,6 +326,7 @@ export default class GoogleHelper {
         }
       }
     });
+    
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {
@@ -330,8 +336,8 @@ export default class GoogleHelper {
   }
 
   addLogoToSlideData(deckId, logoURL, titleSlide, diagramSlide) {
-    let slideId1 = titleSlide.objectId;
-    let slideId2 = "g8083697ea8_0_58";//diagramSlide.objectId;
+    //let slideId1 = titleSlide.objectId;
+    //let slideId2 = "g8083697ea8_0_58";//diagramSlide.objectId;
     var requests = [];
     var imageId = "customerLogo2";
     var emu4M = {
@@ -339,7 +345,18 @@ export default class GoogleHelper {
       unit: "EMU"
     };
 
-    //add a request for placing the customer logo on the title slide
+    //add a request to replace text with logos
+    requests.push({
+      replaceAllShapesWithImage: {
+        imageUrl: logoURL,
+        containsText: {
+            text: "{{LOGO}}"
+        }
+    
+    }});
+    
+
+    /*add a request for placing the customer logo on the title slide
     requests.push({
       createImage: {
         objectId: imageId,
@@ -360,8 +377,9 @@ export default class GoogleHelper {
         }
       }
     });
+    */
 
-    //add a request to place each customer logo on the diagram slide
+    /*add a request to place each customer logo on the diagram slide
     requests.push({
       createImage: {
         objectId: "logo3",
@@ -403,7 +421,7 @@ export default class GoogleHelper {
         }
       }
     });
-
+*/
 
     return new Promise((resolve, reject) => {
       this.batchUpdateDeck(deckId, requests).then(() => {
